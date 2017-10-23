@@ -1,8 +1,8 @@
 #include "ros/ros.h"
 #include "ev3_ros/MotorCommands.h"
 
-//using ev3_ros::MotorCommands;
-using namespace ros;
+using ev3_ros::MotorCommands;
+//using namespace ros;
 
 int main(int argc, char **argv)
 {
@@ -10,17 +10,16 @@ int main(int argc, char **argv)
 
   ros::NodeHandle n;
 
-//  ros::Publisher motor_command_pub = n.advertise<MotorCommands>("motor_command", 1000);
+  ros::Publisher motor_command_pub = n.advertise<MotorCommands>("motor_command", 1000);
 
   ros::Rate loop_rate(10);
 
   int duration = 0;
 
-//  MotorCommands mc;
+  MotorCommands mc;
 
   while (ros::ok())
   {
-    /*
     switch(duration%10) {
       case 1 :
         mc.speed = 100;
@@ -31,9 +30,9 @@ int main(int argc, char **argv)
       default :
         mc.speed = 0;
         mc.direction = 0;
-    }*/
+    }
   
-//    motor_command_pub.publish(mc);
+    motor_command_pub.publish(mc);
 
     ros::spinOnce();
 
