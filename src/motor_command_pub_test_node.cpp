@@ -20,16 +20,13 @@ int main(int argc, char **argv)
 
   while (ros::ok())
   {
-    switch(duration%10) {
+    switch(duration%100) {
       case 1 :
         mc.speed = 100;
         break;
       case 6 :
         mc.speed = -100;
         break;
-      default :
-        mc.speed = 0;
-        mc.direction = 0;
     }
   
     motor_command_pub.publish(mc);
