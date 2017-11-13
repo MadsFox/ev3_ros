@@ -22,12 +22,13 @@ int main(int argc, char **argv)
   {
     switch(duration%100) {
       case 1 :
-        mc.speed = 100;
+        mc.right_motor = 100;
+        mc.left_motor = -50;
         break;
       case 6 :
-        mc.speed = -100;
+        mc.right_motor = -50;
+        mc.left_motor = 100;
         break;
-      default :
     }
   
     motor_command_pub.publish(mc);

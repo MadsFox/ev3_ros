@@ -22,10 +22,12 @@ int main(int argc, char **argv)
   {
     switch(duration%100) {
       case 1 :
-        mc.speed = 100;
+        mc.right_speed = 100;
+        mc.left_speed = -50;
         break;
       case 6 :
-        mc.speed = -100;
+        mc.right_speed = -50;
+        mc.left_speed = 100;
         break;
     }
   

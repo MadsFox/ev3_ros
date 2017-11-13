@@ -10,8 +10,8 @@ void turtlebotKeyCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
   //float x = 500 * msg->linear.x;
   //float z = msg->angular.z;
-  mc.right_speed = msg->linear.x + msg->angular.z;
-  mc.left_speed = msg->linear.x - msg->angular.z;
+  mc.right_speed = msg->linear.x;
+  mc.left_speed = msg->angular.z;
 //  ROS_INFO("trying to print liniar x values: %f and angular z values: %f", x, z);
 }
 
