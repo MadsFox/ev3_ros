@@ -107,7 +107,7 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ev3_ros
   CATKIN_DEPENDS roscpp rospy std_msgs message_runtime geometry_msgs
-#  DEPENDS system_lib
+  DEPENDS robot pose manuscriptHelpers event route sceneObject screenPoint
 )
 
 ###########
@@ -117,14 +117,32 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/ev3_ros.cpp
-# )
+add_library(robot
+  src/robot.cpp
+)
+add_library(pose
+  include/manuscriptBuilder/pose.cpp
+)
+add_library(event
+  include/manuscriptBuilder/event.cpp
+)
+add_library(route
+  include/manuscriptBuilder/route.cpp
+)
+add_library(sceneObject
+  include/manuscriptBuilder/sceneObject.cpp
+)
+add_library(screenPoint
+  include/manuscriptBuilder/screenPoint.cpp
+)
+add_library(manuscriptHelpers
+  include/manuscriptBuilder/manuscriptHelpers.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -156,6 +174,34 @@ target_link_libraries(motor_command_pub_test_node
 )
 
 target_link_libraries(motor_command_pub_keyboard
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(robot  
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(pose
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(manuscriptHelpers
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(event
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(route
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(sceneObject
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(screenPoint
   ${catkin_LIBRARIES}
 )
 
