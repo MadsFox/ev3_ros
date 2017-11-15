@@ -123,7 +123,7 @@ include_directories(
 
 ## Declare a C++ library
 add_library(robot
-  src/robot.cpp
+  include/manuscriptBuilder/robot.cpp
 )
 add_library(pose
   include/manuscriptBuilder/pose.cpp
