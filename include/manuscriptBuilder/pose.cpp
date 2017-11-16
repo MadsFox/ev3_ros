@@ -1,4 +1,6 @@
 #include "screenPoint.cpp"
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 using screenPoint;
 
@@ -9,7 +11,7 @@ class Pose {// for a robot
   Pose(ScenePoint ss, float dd) {position = ss; direction=dd;}
   
   Pose klone() {return new Pose(position.klone(),direction);} // intuitively same as clone, but returns object of right class
-  String toString() {return position+"*phi="+direction;}
+  string toString() {return position+"*phi="+direction;}
 
   void moveRelPhiD(float deltaPhi, float deltaDist) {
     // phi added to current direction, but scaled by deltaDist AND SOME CONSTANT THAT DEPENDS ON PHYSICAL DETAILS OF THE ROBOT
@@ -51,7 +53,7 @@ float wnw=west+90/4;
 float nnw=360-90/4;
 
 float normalizeAngle(float phi) {if(phi<0)return normalizeAngle(phi+360);else if(phi>=360)return normalizeAngle(phi-360); else return phi;}
-float normalizeAngleRad(float phi) {if(phi<0)return normalizeAngle(phi+TWO_PI);else if(phi>=TWO_PI)return normalizeAngle(phi-TWO_PI); else return phi;}
+float normalizeAngleRad(float phi) {if(phi<0)return normalizeAngle(phi+2*M_PI);else if(phi>=2*M_PI)return normalizeAngle(phi-2*M_PI); else return phi;}
 
 static final float robotTurningDiameter = 0.7;
   // Currently only used for checking feasibility of generated route

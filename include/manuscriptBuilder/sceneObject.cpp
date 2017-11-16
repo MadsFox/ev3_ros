@@ -1,4 +1,5 @@
-
+#include <string>
+#include "scenePoint.cpp"
 
 class SceneObject {
   string topic;

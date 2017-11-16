@@ -1,10 +1,10 @@
 #include "robot.cpp"
 #include "pose.cpp"
+#include <vector>
+#include <time.h>
 
 // keep track of all events prescribed by manuscript and make it possible for "draw" to execute it;
 // haha, den skal da bruge absolut tid !!!!
-
-import java.util.*;
 
 class Event {
   float time; // seconds from beginning of story
@@ -23,40 +23,40 @@ class Event {
 
 }
 
-ArrayList<Event> eventList = new ArrayList<Event>();
+std::vector<Event> eventList;
 
 float timeOfLastGeneratedEvent() {
   float t=-1;
   for(int i=0;i<eventList.size();i++)
-    if(eventList.get(i).time>t) t=eventList.get(i).time;
+    if(eventList[i].time>t) t=eventList[i].time;
   return t;
 }
 
 float timeOfLastGeneratedEvent(Robot r) {
   float t=-1;
   for(int i=0;i<eventList.size();i++)
-    if(eventList.get(i).rob==r && eventList.get(i).time>t) t=eventList.get(i).time;
+    if(eventList[i].rob==r && eventList[i].time>t) t=eventList[i].time;
   return t;
 }
-void sortEventList() {Collections.sort(eventList);}
+void sortEventList() {std::sort(eventList);}
 
-void printEventList() {for(int i=0;i<eventList.size();i++) println(eventList.get(i)+"");}
+void printEventList() {for(int i=0;i<eventList.size();i++) println(eventList[i]+"");}
 
-int initialMachineTime;
+float initialMachineTime;
 
 float simulationTime;
 
-void initTime() {initialMachineTime = millis();}
+void initTime() {initialMachineTime = (float)clock()/CLOCKS_PER_SEC}
 
-float currentSimulationTime() {return ((float)(millis()-initialMachineTime))/1000;}
+float currentSimulationTime() {return (((float)clock()/CLOCKS_PER_SEV)-initialMachineTime)/1000;}
 
 void executeCurrentEvents() {
   float t= currentSimulationTime();
  // println("executeCurrentEvents() at sim. time "+t+", remaining events: " +eventList.size());
-  while(eventList.size()>0 && eventList.get(0).time<t) {
-    if(eventList.get(0).nextPose!=null) eventList.get(0).rob.pose=eventList.get(0).nextPose;
-    eventList.remove(0);}
+  while(eventList.size()>0 && eventList[0].time<t) {
+    if(eventList[0].nextPose!=null) eventList[0].rob.pose=eventList[0].nextPose;
+    eventList.erase(0);}
 }
 
-boolean noMoreEvents() {return eventList.isEmpty();}
+bool noMoreEvents() {return eventList.empty();}
   

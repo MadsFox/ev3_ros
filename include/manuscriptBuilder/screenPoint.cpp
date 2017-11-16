@@ -5,16 +5,28 @@
 
 // internal units are meters
 
-float m=1;
-float sw=sceneWidth;
-float hsw=sceneWidth/2;
-float sd=sceneDepth;
 
-float toScreenUnit(float sceneDist) {return sceneDist/sceneWidth*width;}
+
+class Scene {
+  float sw;
+  float hsw;
+  float sd;
+
+  Scene(float sceneWidth, float sceneDepth){
+    sw = sceneWidth;
+    hsw = sceneWidth/2;
+    sd = sceneDepth;
+  }
+};
+
+float toScreenUnit(float sceneDist, Scene s) {return sceneDist/s.sw*width;}
 
 class ScreenPoint {int x;int y;ScreenPoint(int xx,int yy){x=xx;y=yy;}}
 
-class ScenePoint {float x;float y;ScenePoint(float xx,float yy){x=xx;y=yy;}
+class ScenePoint {
+  float x;
+  float y;
+  ScenePoint(float xx,float yy){x=xx;y=yy;}
 
   ScenePoint klone() {return new ScenePoint(x,y);}
   

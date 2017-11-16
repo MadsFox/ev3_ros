@@ -1,4 +1,4 @@
-
+#include "pose.cpp"
 
 float epsilon = 0.01; // 1 cm
 
