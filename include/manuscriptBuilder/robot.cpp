@@ -1,6 +1,6 @@
-#include "sceneObject.h"
-#include "pose.h"
-#include "screenPoint.h"
+#include "sceneObject.cpp"
+#include "pose.cpp"
+#include "screenPoint.cpp"
 
 namespace robot {
 
@@ -22,7 +22,6 @@ class Robot extends SceneObject{
   void set(Pose p) {pose=p;}
 
 //TODO: write method to run motorcommands(mayby this is where ROS publishes)
-  @ Override
   void run() {
     ScreenPoint p=pose.position.toScreenPoint();
     float sr=toScreenUnit(diameter/2);
@@ -42,13 +41,12 @@ class Robot extends SceneObject{
   
 //  void moveTo(Pose p) {pose=p;}
 
-  @ Override
-  boolean hasInside(ScenePoint sp) {
+  bool hasInside(ScenePoint sp) {
     float x=pose.position.x; float y=pose.position.y;
     return x-diameter/2<=sp.x && sp.x<=x+diameter/2 && y-diameter/2<=sp.y && sp.y<=y+diameter/2;
   }
     
-  boolean overlappingOther() {
+  bool overlappingOther() {
     float x=pose.position.x; float y=pose.position.y;
     float r=diameter/2;
     boolean result=false;

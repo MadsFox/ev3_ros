@@ -1,9 +1,9 @@
-SceneObject [] allSceneObjects = new SceneObject[0];
+
 
 class SceneObject {
-  String topic;
-  boolean hasInside(ScenePoint sp) {return false;} // to be overridden (when relevant)
-  boolean hasInside(Pose p) {return hasInside(p.position);}
+  string topic;
+  virtual bool hasInside(ScenePoint sp) {return false;} // to be overridden (when relevant)
+  virtual bool hasInside(Pose p) {return hasInside(p.position);}
 }
 
 void drawAllSceneObjects() {
@@ -23,3 +23,5 @@ void addSceneObject(SceneObject so) {
   for(int i=0;i<old.length;i++)allSceneObjects[i]=old[i];
   allSceneObjects[old.length]=so;
 }
+
+SceneObject allSceneObjects[0]

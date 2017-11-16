@@ -23,7 +23,6 @@ class ScenePoint {float x;float y;ScenePoint(float xx,float yy){x=xx;y=yy;}
     int scrY=round(height-y/sceneDepth*height);
     return new ScreenPoint(scrX,scrY);}
 
-  @ Override
   String toString() {return "<"+x+","+y+">";}
 
   boolean runaway(){return x>hsw||x<-hsw||y>sd||y<0;}

@@ -1,6 +1,6 @@
-#include "sceneObject.h"
-#include "pose.h"
-#include "screenPoint.h"
+#include "sceneObject.cpp"
+#include "pose.cpp"
+#include "screenPoint.cpp"
 
 namespace robot {
 

@@ -1,4 +1,6 @@
-using "screenPoint.h"
+#include "screenPoint.cpp"
+
+using screenPoint;
 
 class Pose {// for a robot
   ScenePoint position; 
@@ -7,7 +9,6 @@ class Pose {// for a robot
   Pose(ScenePoint ss, float dd) {position = ss; direction=dd;}
   
   Pose klone() {return new Pose(position.klone(),direction);} // intuitively same as clone, but returns object of right class
-  @ Override
   String toString() {return position+"*phi="+direction;}
 
   void moveRelPhiD(float deltaPhi, float deltaDist) {

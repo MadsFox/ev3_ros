@@ -1,12 +1,12 @@
-#include "robot.h"
-#include "pose.h"
+#include "robot.cpp"
+#include "pose.cpp"
 
 // keep track of all events prescribed by manuscript and make it possible for "draw" to execute it;
 // haha, den skal da bruge absolut tid !!!!
 
 import java.util.*;
 
-class Event implements Comparable {
+class Event {
   float time; // seconds from beginning of story
   Robot rob;
   Pose nextPose;  // in nextPose=null, this means a no-event; used for implementing waiting
@@ -15,13 +15,10 @@ class Event implements Comparable {
 
   Event(float tt,Robot rr, float waitingTime) {time=tt+waitingTime;rob=rr;nextPose=null;eventList.add(this);}
   
-  @Override
   public int compareTo(Object e) {
     float d= time - ((Event)e).time;
     if(d<0) return -1; if(d>0) return 1; return 0;
   }
-  
-  @Override
   String toString() {return time+": "+rob.name+nextPose;}
 
 }
