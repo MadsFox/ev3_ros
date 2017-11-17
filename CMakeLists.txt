@@ -122,19 +122,23 @@ include_directories(
 )
 
 ## Declare a C++ library
-add_library(robot include/manuscriptBuilder/robot.cpp)
+add_library(scene include/manuscriptBuilder/Scene.cpp)
 
-add_library(pose include/manuscriptBuilder/pose.cpp)
+#add_library(robot include/manuscriptBuilder/Robot.cpp)
 
-add_library(event include/manuscriptBuilder/event.cpp)
+#add_library(pose include/manuscriptBuilder/Pose.cpp)
 
-add_library(route include/manuscriptBuilder/route.cpp)
+#add_library(event include/manuscriptBuilder/Event.cpp)
 
-add_library(sceneObject include/manuscriptBuilder/sceneObject.cpp)
+#add_library(route include/manuscriptBuilder/Route.cpp)
 
-add_library(screenPoint include/manuscriptBuilder/screenPoint.cpp)
+add_library(sceneObject include/manuscriptBuilder/SceneObject.cpp)
 
-add_library(manuscriptHelpers include/manuscriptBuilder/manuscriptHelpers.cpp)
+add_library(screenPoint include/manuscriptBuilder/ScreenPoint.cpp)
+
+add_library(scenePoint include/manuscriptBuilder/ScenePoint.cpp)
+
+#add_library(manuscriptHelpers include/ManuscriptHelpers/manuscriptBuilder.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -169,19 +173,23 @@ target_link_libraries(motor_command_pub_keyboard
   ${catkin_LIBRARIES}
 )
 
-target_link_libraries(robot ${catkin_LIBRARIES})
+#target_link_libraries(robot ${catkin_LIBRARIES})
 
-target_link_libraries(pose ${catkin_LIBRARIES})
+#target_link_libraries(pose ${catkin_LIBRARIES})
 
-target_link_libraries(manuscriptHelpers ${catkin_LIBRARIES})
+#target_link_libraries(manuscriptHelpers ${catkin_LIBRARIES})
 
-target_link_libraries(event ${catkin_LIBRARIES})
+#target_link_libraries(event ${catkin_LIBRARIES})
 
-target_link_libraries(route ${catkin_LIBRARIES})
+#target_link_libraries(route ${catkin_LIBRARIES})
+
+target_link_libraries(scene ${catkin_LIBRARIES})
 
 target_link_libraries(sceneObject ${catkin_LIBRARIES})
 
 target_link_libraries(screenPoint ${catkin_LIBRARIES})
+
+target_link_libraries(scenePoint ${catkin_LIBRARIES})
 
 #############
 ## Install ##
