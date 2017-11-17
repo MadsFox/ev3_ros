@@ -1,8 +1,7 @@
 #include <string>
 #include <vector>
 #include "ScenePoint.cpp"
-
-using vector;
+#include "Pose.cpp"
 
 using namespace std;
 
@@ -12,8 +11,10 @@ class SceneObject {
     virtual bool hasInside(ScenePoint sp); // to be overridden (when relevant)
     virtual bool hasInside(Pose p);
     friend void drawAllSceneObjects();
-    friend
-    friend
+    friend int indexOf(SceneObject so);
+    friend void addSceneObject(SceneObject so);
+  private:
+    vector<SceneObject> allSceneObjects;
 };
 
 bool SceneObject::hasInside(ScenePoint sp) {return false;}
@@ -37,5 +38,3 @@ void addSceneObject(SceneObject so) {
   for(int i=0;i<old.size();i++)allSceneObjects[i]=old[i];
   allSceneObjects[old.size()]=so;*/
 }
-
-vector<SceneObject> allSceneObjects;

@@ -8,7 +8,7 @@
 using namespace std;
 
 class ScenePoint{
-  private:
+  public:
     //Class methods
     //ScenePoint klone();
     string toString();
