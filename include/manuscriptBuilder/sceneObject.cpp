@@ -1,11 +1,14 @@
 #include <string>
 #include "scenePoint.cpp"
 
+using namespace std;
+
 class SceneObject {
-  string topic;
-  virtual bool hasInside(ScenePoint sp) {return false;} // to be overridden (when relevant)
-  virtual bool hasInside(Pose p) {return hasInside(p.position);}
-}
+  public:
+    string topic;
+    virtual bool hasInside(ScenePoint sp) {return false;} // to be overridden (when relevant)
+    virtual bool hasInside(Pose p) {return hasInside(p.position);}
+};
 
 void drawAllSceneObjects() {
  for(int i=0;i<allSceneObjects.length;i++) if(allSceneObjects[i] instanceof RestrictedArea)allSceneObjects[i].draw();
@@ -19,7 +22,7 @@ int indexOf(SceneObject so) {
 }
 
 void addSceneObject(SceneObject so) {
-  SceneObject [] old = allSceneObjects;
+  SceneObject old[] = allSceneObjects;
   allSceneObjects = new SceneObject[old.length+1];
   for(int i=0;i<old.length;i++)allSceneObjects[i]=old[i];
   allSceneObjects[old.length]=so;

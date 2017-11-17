@@ -5,7 +5,7 @@
 
 // manuscript writing time information
 
-Pose [] mostRecentRecordedPose = new Pose[100]; // enough
+Pose mostRecentRecordedPose[100]; // enough
 
 void initialPose(Robot r, Pose p) {
   // maintain manuscript writing time information

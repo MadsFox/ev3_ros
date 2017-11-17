@@ -5,25 +5,26 @@
 using screenPoint;
 
 class Pose {// for a robot
-  ScenePoint position; 
-  float direction; // 0..360;
-  Pose(float xx, float yy, float dd) {position = new ScenePoint(xx,yy); direction=dd;}
-  Pose(ScenePoint ss, float dd) {position = ss; direction=dd;}
+  public:
+    ScenePoint position; 
+    float direction; // 0..360;
+    Pose(float xx, float yy, float dd) {position = new ScenePoint(xx,yy); direction=dd;}
+    Pose(ScenePoint ss, float dd) {position = ss; direction=dd;}
+    
+    Pose klone() {return new Pose(position.klone(),direction);} // intuitively same as clone, but returns object of right class
+    string toString() {return position+"*phi="+direction;}
   
-  Pose klone() {return new Pose(position.klone(),direction);} // intuitively same as clone, but returns object of right class
-  string toString() {return position+"*phi="+direction;}
-
-  void moveRelPhiD(float deltaPhi, float deltaDist) {
-    // phi added to current direction, but scaled by deltaDist AND SOME CONSTANT THAT DEPENDS ON PHYSICAL DETAILS OF THE ROBOT
-    moveAbsPhiD(direction+deltaPhi*abs(deltaDist)*4,deltaDist);
-  }
-
-  void moveAbsPhiD(float phi, float deltaDist) {
-    // set new direction and move
-    direction=normalizeAngle(phi);
-    position.moveRelPhiD(direction,deltaDist);
-  }
-}
+    void moveRelPhiD(float deltaPhi, float deltaDist) {
+      // phi added to current direction, but scaled by deltaDist AND SOME CONSTANT THAT DEPENDS ON PHYSICAL DETAILS OF THE ROBOT
+      moveAbsPhiD(direction+deltaPhi*abs(deltaDist)*4,deltaDist);
+    }
+  
+    void moveAbsPhiD(float phi, float deltaDist) {
+      // set new direction and move
+      direction=normalizeAngle(phi);
+      position.moveRelPhiD(direction,deltaDist);
+    }
+};
 
 // easy constructor:
 Pose pose(float x, float y, float d) {return new Pose(x,y,d);}

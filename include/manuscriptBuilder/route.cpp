@@ -1,24 +1,27 @@
 #include "pose.cpp"
+#include "scenePoint.cpp"
+
 
 float epsilon = 0.01; // 1 cm
 
 class Route {  // find bedre navn
-  int noOfSteps;
-  Pose[] poses; // no assumptions here about speed
-  float travelDist;  // in metres; will only be approximate
-
-  Route(int n, Pose[] pp, float td) {noOfSteps=n; poses=pp; travelDist=td;}
+  public:
+    int noOfSteps;
+    Pose poses[]; // no assumptions here about speed
+    float travelDist;  // in metres; will only be approximate
   
-  //Route(Pose from, Pose to) {
-  //    Route r=null;
-  //    r= forwardRoute(from,to);
-  //    if(r==null){
-  //      println("Route("+from+", "+to+") too complicated; try something else!!!!!!!!!!!!!!!!");
-  //      System.exit(1);
-  //      noOfSteps=0; poses=null; noOfSteps=0;}
-  //    else{noOfSteps=r.noOfSteps; poses=r.poses;}
-  //}
-}
+    Route(int n, Pose[] pp, float td) {noOfSteps=n; poses=pp; travelDist=td;}
+    
+    //Route(Pose from, Pose to) {
+    //    Route r=NULL;
+    //    r= forwardRoute(from,to);
+    //    if(r==NULL){
+    //      println("Route("+from+", "+to+") too complicated; try something else!!!!!!!!!!!!!!!!");
+    //      System.exit(1);
+    //      noOfSteps=0; poses=NULL; noOfSteps=0;}
+    //    else{noOfSteps=r.noOfSteps; poses=r.poses;}
+    //}
+};
 
 Route forwardRoute(Pose from, Pose to) {
   float travelDist = 0;
@@ -31,7 +34,7 @@ Route forwardRoute(Pose from, Pose to) {
   Pose currentFrom=from; Pose currentTo=to;
   while(dist(currentFrom,currentTo)>=2*epsilon && pathLength<100000) {
     pathLength+=2;
-    Pose station1=null; float bestDist=10000000;
+    Pose station1=NULL; float bestDist=10000000;
     for(int k=0; k<=101; k++) {  // use odd number (100+1) so "straight ahead" is also an option
       Pose suggest = currentFrom.klone();
       suggest.moveRelPhiD(-maxTurn+float(k)/101*2*maxTurn,epsilon);
@@ -42,7 +45,7 @@ Route forwardRoute(Pose from, Pose to) {
     currentFrom=station1;
     lastHalf.add(currentTo);
     
-    Pose stationN=null;bestDist=10000000;
+    Pose stationN=NULL;bestDist=10000000;
     for(int k=0; k<=101; k++) {  // use odd number (100+1) so "straight ahead" is also an option
       Pose suggest = currentTo.klone();
       suggest.moveRelPhiD(-maxTurn+float(k)/101*2*maxTurn,-epsilon); // break symmetry by change of direction                                                         
@@ -52,7 +55,7 @@ Route forwardRoute(Pose from, Pose to) {
     currentTo=stationN; travelDist+=epsilon; 
   }
   
-  Pose[] allPoses = new Pose[firstHalf.size()+lastHalf.size()+1];
+  Pose allPoses[firstHalf.size()+lastHalf.size()+1];
   for(int i=0; i<firstHalf.size(); i++) allPoses[i]=firstHalf.get(i);
   allPoses[firstHalf.size()] = avg(currentFrom,currentTo); travelDist=dist(from,to);
   for(int i=0; i<lastHalf.size(); i++) allPoses[firstHalf.size()+lastHalf.size()-i]=lastHalf.get(i);
@@ -68,22 +71,9 @@ Route forwardRoute(Pose from, Pose to) {
 ////////////////////////////////////////////////////////////end
 ////////////////////////////////////////////////////////////
 
-
-
-Route backwardRoute(Pose from, Pose to) {
-      Route r=null;
-      r= mkBackwardRouteFromBotheEndsINTERNAL(from,to);
-      if(r==null){
-        println("Route("+from+", "+to+") too complicated; try something else");
-        System.exit(1); } 
-      return r;
-  }
-
-
- 
 Route mkBackwardRouteFromBotheEndsINTERNAL(Pose from, Pose to) {
   Route r = forwardRoute(to, from);
-  if(r==null) return null;
+  if(r==NULL) return NULL;
   // reverse
   int m= r.noOfSteps/2; if(r.noOfSteps/2*2==r.noOfSteps) m+=1; 
   for(int i=0; i<m; i++) {
@@ -95,6 +85,20 @@ Route mkBackwardRouteFromBotheEndsINTERNAL(Pose from, Pose to) {
   return r;
 }
 
+Route backwardRoute(Pose from, Pose to) {
+  Route r=NULL;
+  r= mkBackwardRouteFromBotheEndsINTERNAL(from,to);
+  if(r==NULL){
+    println("Route("+from+", "+to+") too complicated; try something else");
+    System.exit(1); 
+  } 
+  return r;
+}
+
+
+ 
+
+
 
 Route forwardTurnLeftRoute(Pose p, float radius, float angle) {
  ScenePoint center=p.position.klone();
@@ -102,7 +106,7 @@ Route forwardTurnLeftRoute(Pose p, float radius, float angle) {
  float phi0 = normalizeAngle(p.direction+90);
  float travelLength = radius*radians(angle);
  int noOfSteps = round(travelLength/epsilon);
- Pose[] poses = new Pose[noOfSteps];
+ Pose poses[noOfSteps];
  for(int i=0;i<noOfSteps;i++) {
    float phi = normalizeAngle(phi0 - (i+1)*angle/noOfSteps);
    poses[i] = new Pose(center.x+sin(radians(phi))*radius, center.y+cos(radians(phi))*radius, normalizeAngle(phi-90));
@@ -117,7 +121,7 @@ Route forwardTurnRightRoute(Pose p, float radius, float angle) {
  float phi0 = normalizeAngle(p.direction-90);
  float travelLength = radius*radians(angle);
  int noOfSteps = round(travelLength/epsilon);
- Pose[] poses = new Pose[noOfSteps];
+ Pose poses[noOfSteps];
  for(int i=0;i<noOfSteps;i++) {
    float phi = normalizeAngle(phi0 + (i+1)*angle/noOfSteps);
    poses[i] = new Pose(center.x+sin(radians(phi))*radius, center.y+cos(radians(phi))*radius, normalizeAngle(phi+90));
@@ -132,7 +136,7 @@ Route backwardTurnLeftRoute(Pose p, float radius, float angle) {
  float phi0 = normalizeAngle(p.direction+90);
  float travelLength = radius*radians(angle);
  int noOfSteps = round(travelLength/epsilon);
- Pose[] poses = new Pose[noOfSteps];
+ Pose poses[noOfSteps];
  for(int i=0;i<noOfSteps;i++) {
    float phi = normalizeAngle(phi0 + (i+1)*angle/noOfSteps);
    poses[i] = new Pose(center.x+sin(radians(phi))*radius, center.y+cos(radians(phi))*radius, normalizeAngle(phi-90));
@@ -146,7 +150,7 @@ Route backwardTurnRightRoute(Pose p, float radius, float angle) {
  float phi0 = normalizeAngle(p.direction-90);
  float travelLength = radius*radians(angle);
  int noOfSteps = round(travelLength/epsilon);
- Pose[] poses = new Pose[noOfSteps];
+ Pose poses[noOfSteps];
  for(int i=0;i<noOfSteps;i++) {
    float phi = normalizeAngle(phi0 - (i+1)*angle/noOfSteps);
    poses[i] = new Pose(center.x+sin(radians(phi))*radius, center.y+cos(radians(phi))*radius, normalizeAngle(phi+90));
