@@ -16,6 +16,7 @@ class ScenePoint{
     void moveRelXRelY(float deltaX, float deltaY);
     void moveRelPhiD(float phi, float deltaDist);
     float dist(ScenePoint p);
+    bool operator==(ScenePoint sp);
     friend ScenePoint p(Scene scene, float x, float y);//friend functions can accessed class members outside of object/class.
     friend ScenePoint avg(Scene scene, ScenePoint p1, ScenePoint p2);
     friend float dist(ScenePoint p1, ScenePoint p2);
@@ -69,6 +70,13 @@ void ScenePoint::moveRelPhiD(float phi, float deltaDist) {
 
 float ScenePoint::dist(ScenePoint p) {
   return sqrt( sqrt(x-p.x) + sqrt(y-p.y));
+}
+
+bool ScenePoint::operator==(ScenePoint sp){
+  if(x == sp.x && y == sp.y && scene == sp.scene){
+    return true;
+  }
+  return false;
 }
 
 // easy constructor

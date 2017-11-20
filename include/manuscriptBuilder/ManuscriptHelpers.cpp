@@ -1,6 +1,4 @@
-#include "Pose.cpp"
 #include "Route.cpp"
-#include "Robot.cpp"
 #include "Event.cpp"
 
 // manuscript writing time information

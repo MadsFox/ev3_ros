@@ -3,18 +3,21 @@
 #include <math.h>
 #include <string>
 #include <sstream>
+//#include <stdlib.h>
+#include <cmath>
 
 using namespace std;
 
-class Pose {// for a robot
+class Pose : public ScenePoint {// for a robot
   public:
     //Class methods
     Pose klone();// intuitively same as clone, but returns object of right class
     string toString();
     void moveRelPhiD(float deltaPhi, float deltaDist);  
     void moveAbsPhiD(float phi, float deltaDist);
-    friend Pose pose(float x, float y, float d);
-    friend Pose avg(Pose p1, Pose p2);
+    bool operator==(Pose po);
+    friend Pose pose(Scene scene, float x, float y, float d);
+    friend Pose avgPose(Scene scene, Pose p1, Pose p2);
     friend float normalizeAngle(float phi);
     friend float normalizeAngleRad(float phi);
     friend float dist(Pose p1, Pose p2);
@@ -25,7 +28,7 @@ class Pose {// for a robot
     Pose(ScenePoint ss, float dd);
     Pose(){};
     ~Pose();
-  private:
+//  private:
     Scene scene;
     ScenePoint position; 
     float direction; // 0..360;
@@ -109,25 +112,33 @@ void Pose::moveRelPhiD(float deltaPhi, float deltaDist) {
   moveAbsPhiD(direction+deltaPhi*abs(deltaDist)*4,deltaDist);
 }
 
+float normalizeAngle(float phi) {if(phi<0)return normalizeAngle(phi+360);else if(phi>=360)return normalizeAngle(phi-360); else return phi;}
+float normalizeAngleRad(float phi) {if(phi<0)return normalizeAngle(phi+2*M_PI);else if(phi>=2*M_PI)return normalizeAngle(phi-2*M_PI); else return phi;}
+
+
 void Pose::moveAbsPhiD(float phi, float deltaDist) {
   // set new direction and move
   direction=normalizeAngle(phi);
   position.moveRelPhiD(direction,deltaDist);
+}
+
+bool Pose::operator==(Pose po){
+  if(position == po.position && direction == po.direction){
+    return true;
+  }
+  return false;
 }    
 
 // easy constructor:
-Pose pose(float x, float y, float d) {return Pose(x,y,d);}
+Pose pose(Scene scene, float x, float y, float d) {return Pose(scene, x,y,d);}
 
-Pose avg(Pose p1, Pose p2) {
-  return Pose(avg(p1::position,p2::position),(p1::direction+p2::direction)/2);
+Pose avgPose(Scene scene, Pose p1, Pose p2) {
+  return Pose(avg(scene, p1.position,p2.position),(p1.direction+p2.direction)/2);
 }
-
-float normalizeAngle(float phi) {if(phi<0)return normalizeAngle(phi+360);else if(phi>=360)return normalizeAngle(phi-360); else return phi;}
-float normalizeAngleRad(float phi) {if(phi<0)return normalizeAngle(phi+2*M_PI);else if(phi>=2*M_PI)return normalizeAngle(phi-2*M_PI); else return phi;}
 
 float dist(Pose p1, Pose p2) {
   // plain euclidian, ignoring direction
-  return dist(p1::position, p2::position);
+  return dist(p1.position, p2.position);
 }
-float dist(Pose p1, ScenePoint p2) {return dist(p1::position, p2);}
-float dist(ScenePoint p1, Pose p2) {return dist(p1, p2::position);}
+float dist(Pose p1, ScenePoint p2) {return dist(p1.position, p2);}
+float dist(ScenePoint p1, Pose p2) {return dist(p1, p2.position);}

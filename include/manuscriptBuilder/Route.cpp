@@ -1,6 +1,6 @@
 #include <vector>
-#include "Pose.cpp"
-#include "ScenePoint.cpp"
+#include "Robot.cpp"
+#include <iostream>
 
 using namespace std;
 
@@ -8,12 +8,23 @@ float epsilon = 0.01; // 1 cm
 
 class Route {  // find bedre navn
   public:
+    Route(Robot r, int n, vector<Pose> pp, float td);
+    Route(){};
+    ~Route();
+    bool operator==(Route r);
+    friend Route forwardRoute(Robot robot, Pose from, Pose to);
+    friend Route mkBackwardRouteFromBotheEndsINTERNAL(Robot robot, Pose from, Pose to);
+    friend Route backwardRoute(Robot robot, Pose from, Pose to);
+    friend Route forwardTurnLeftRoute(Robot robot, Pose p, float radius, float angle);
+    friend Route forwardTurnRightRoute(Robot robot, Pose p, float radius, float angle);
+    friend Route backwardTurnLeftRoute(Robot robot, Pose p, float radius, float angle);
+    friend Route backwardTurnRightRoute(Robot robot, Pose p, float radius, float angle);
+//  private:
+    Robot robot;
     int noOfSteps;
     vector<Pose> poses; // no assumptions here about speed
     float travelDist;  // in metres; will only be approximate
-  
-    Route(int n, vector<Pose> pp, float td) {noOfSteps=n; poses=pp; travelDist=td;}
-    
+      
     //Route(Pose from, Pose to) {
     //    Route r=NULL;
     //    r= forwardRoute(from,to);
@@ -25,7 +36,24 @@ class Route {  // find bedre navn
     //}
 };
 
-Route forwardRoute(Pose from, Pose to) {
+Route::Route(Robot r, int n, vector<Pose> pp, float td) {robot=r;noOfSteps=n; poses=pp; travelDist=td;}
+
+bool Route::operator==(Route r){
+  bool equal = false;;
+  if(robot == r.robot && noOfSteps == r.noOfSteps && poses.size() == r.poses.size() && travelDist == r.travelDist){
+    for(int i = 0; i < poses.size(); i++){
+      if(poses.at(i) == r.poses.at(i)){
+        equal = true;
+      }else{
+        equal = false;
+        return equal;
+      }
+    }
+  }
+  return equal;
+}
+
+Route forwardRoute(Robot robot, Pose from, Pose to) {
   float travelDist = 0;
   vector<Pose> firstHalf;
   vector<Pose> lastHalf;
@@ -36,10 +64,10 @@ Route forwardRoute(Pose from, Pose to) {
   Pose currentFrom=from; Pose currentTo=to;
   while(dist(currentFrom,currentTo)>=2*epsilon && pathLength<100000) {
     pathLength+=2;
-    Pose station1=NULL; float bestDist=10000000;
+    Pose station1; float bestDist=10000000;
     for(int k=0; k<=101; k++) {  // use odd number (100+1) so "straight ahead" is also an option
       Pose suggest = currentFrom.klone();
-      suggest.moveRelPhiD(-maxTurn+float(k)/101*2*maxTurn,epsilon);
+      suggest.moveRelPhiD(-robot.maxTurn+float(k)/101*2*robot.maxTurn,epsilon);
       float suggestDist = dist(suggest,currentTo);
       if(suggestDist<bestDist) {bestDist=suggestDist;station1=suggest;}
     }
@@ -47,10 +75,10 @@ Route forwardRoute(Pose from, Pose to) {
     currentFrom=station1;
     lastHalf.push_back(currentTo);
     
-    Pose stationN=NULL;bestDist=10000000;
+    Pose stationN; bestDist=10000000;
     for(int k=0; k<=101; k++) {  // use odd number (100+1) so "straight ahead" is also an option
       Pose suggest = currentTo.klone();
-      suggest.moveRelPhiD(-maxTurn+float(k)/101*2*maxTurn,-epsilon); // break symmetry by change of direction                                                         
+      suggest.moveRelPhiD(-robot.maxTurn+float(k)/101*2*robot.maxTurn,-epsilon); // break symmetry by change of direction                                                         
       float suggestDist = dist(suggest,currentFrom);
       if(suggestDist<bestDist) {bestDist=suggestDist;stationN=suggest;}
     }
@@ -58,99 +86,104 @@ Route forwardRoute(Pose from, Pose to) {
   }
   
   Pose allPoses[firstHalf.size()+lastHalf.size()+1];
-  for(int i=0; i<firstHalf.size(); i++) allPoses[i]=firstHalf[i]);
-  allPoses[firstHalf.size()] = avg(currentFrom,currentTo); travelDist=dist(from,to);
+  for(int i=0; i<firstHalf.size(); i++) {allPoses[i]=firstHalf[i];}
+  allPoses[firstHalf.size()] = avgPose(currentFrom.scene, currentFrom,currentTo); travelDist=dist(from,to);
   for(int i=0; i<lastHalf.size(); i++) allPoses[firstHalf.size()+lastHalf.size()-i]=lastHalf[i];
   
   
   
   if(pathLength>=100000) {
-    println("Route("+from+", "+to+") too complicated; try something else");
-    System.exit(1); }
-  return new Route(allPoses::length,allPoses,travelDist);
+    cout << "Route(" << from.toString() << ", " << to.toString() << ") too complicated; try something else";
+    exit(EXIT_FAILURE); }
+  vector<Pose> ap(allPoses, allPoses + sizeof allPoses / sizeof allPoses[0]);
+  return Route(robot, sizeof(allPoses),ap,travelDist);
   /// TEST AND MAKE A WARNING IF travelDist >> robotTurningDiameter*PI + dist(from,to)
 }
 ////////////////////////////////////////////////////////////end
 ////////////////////////////////////////////////////////////
 
-Route mkBackwardRouteFromBotheEndsINTERNAL(Pose from, Pose to) {
-  Route r = forwardRoute(to, from);
-  if(r==NULL) return NULL;
+Route mkBackwardRouteFromBotheEndsINTERNAL(Robot robot, Pose from, Pose to) {
+  Route r = forwardRoute(robot, to, from);
+  Route ro;
+  if(r==ro) return ro;
   // reverse
-  int m= r::noOfSteps/2; if(r::noOfSteps/2*2==r::noOfSteps) m+=1; 
+  int m= r.noOfSteps/2; if(r.noOfSteps/2*2==r.noOfSteps) m+=1; 
   for(int i=0; i<m; i++) {
-    Pose p=r::poses[i];
-    r::poses[i] = r::poses[r::noOfSteps-i-2];
-    r::poses[r::noOfSteps-i-1]=p;
+    Pose p=r.poses[i];
+    r.poses[i] = r.poses[r.noOfSteps-i-2];
+    r.poses[r.noOfSteps-i-1]=p;
   }
-  r::poses[r::noOfSteps-1]=to;
+  r.poses[r.noOfSteps-1]=to;
   return r;
 }
 
-Route backwardRoute(Pose from, Pose to) {
-  Route r=NULL;
-  r= mkBackwardRouteFromBotheEndsINTERNAL(from,to);
-  if(r==NULL){
-    println("Route("+from+", "+to+") too complicated; try something else");
-    System.exit(1); 
+Route backwardRoute(Robot robot, Pose from, Pose to) {
+  Route r;
+  r= mkBackwardRouteFromBotheEndsINTERNAL(robot, from,to);
+  Route ro;
+  if(r==ro){
+    cout << "Route(" << from.toString() << ", " << to.toString() << ") too complicated; try something else";
+    exit(EXIT_FAILURE); 
   } 
   return r;
 }
 
-Route forwardTurnLeftRoute(Pose p, float radius, float angle) {
- ScenePoint center=p::position.klone();
- center.moveRelXRelY(-cos(radians(p::direction))*radius, sin(radians(p::direction))*radius);
- float phi0 = normalizeAngle(p::direction+90);
- float travelLength = radius*radians(angle);
+Route forwardTurnLeftRoute(Robot robot, Pose p, float radius, float angle) {
+ Pose center=p.klone();
+ center.moveRelXRelY(-cos(2*M_PI*p.direction/360)*radius, sin(2*M_PI*p.direction/360)*radius);
+ float phi0 = normalizeAngle(p.direction+90);
+ float travelLength = radius*2*M_PI*angle/360;
  int noOfSteps = round(travelLength/epsilon);
  Pose poses[noOfSteps];
  for(int i=0;i<noOfSteps;i++) {
    float phi = normalizeAngle(phi0 - (i+1)*angle/noOfSteps);
-   poses[i] = new Pose(center::x+sin(radians(phi))*radius, center::y+cos(radians(phi))*radius, normalizeAngle(phi-90));
+   poses[i] = Pose(p.scene, center.x+sin(2*M_PI*phi/360)*radius, center.y+cos(2*M_PI*phi/360)*radius, normalizeAngle(phi-90));
  }
- return new Route(noOfSteps,poses,travelLength);
+ vector<Pose> ps(poses, poses + sizeof poses / sizeof poses[0]);
+ return Route(robot, sizeof(poses),ps,travelLength);
 }
 
 
-Route forwardTurnRightRoute(Pose p, float radius, float angle) {
- ScenePoint center=p::position.klone();
- center.moveRelXRelY(cos(radians(p::direction))*radius, -sin(radians(p::direction))*radius);
- float phi0 = normalizeAngle(p::direction-90);
- float travelLength = radius*radians(angle);
+Route forwardTurnRightRoute(Robot robot, Pose p, float radius, float angle) {
+ Pose center=p.klone();
+ center.moveRelXRelY(cos(2*M_PI*p.direction/360)*radius, -sin(2*M_PI*p.direction/360)*radius);
+ float phi0 = normalizeAngle(p.direction-90);
+ float travelLength = radius*2*M_PI*angle/360;
  int noOfSteps = round(travelLength/epsilon);
  Pose poses[noOfSteps];
  for(int i=0;i<noOfSteps;i++) {
    float phi = normalizeAngle(phi0 + (i+1)*angle/noOfSteps);
-   poses[i] = new Pose(center::x+sin(radians(phi))*radius, center::y+cos(radians(phi))*radius, normalizeAngle(phi+90));
+   poses[i] = Pose(p.scene, center.x+sin(2*M_PI*phi/360)*radius, center.y+cos(2*M_PI*phi/360)*radius, normalizeAngle(phi-90));
  }
- return new Route(noOfSteps,poses,travelLength);
-}
+ vector<Pose> ps(poses, poses + sizeof poses / sizeof poses[0]);
+ return Route(robot, sizeof(poses),ps,travelLength);}
 
 
-Route backwardTurnLeftRoute(Pose p, float radius, float angle) {
- ScenePoint center=p::position.klone();
- center.moveRelXRelY(-cos(radians(p::direction))*radius, sin(radians(p::direction))*radius);
- float phi0 = normalizeAngle(p::direction+90);
- float travelLength = radius*radians(angle);
+Route backwardTurnLeftRoute(Robot robot, Pose p, float radius, float angle) {
+ Pose center=p.klone();
+ center.moveRelXRelY(-cos(2*M_PI*p.direction/360)*radius, sin(2*M_PI*p.direction/360)*radius);
+ float phi0 = normalizeAngle(p.direction+90);
+ float travelLength = radius*2*M_PI*angle/360;
  int noOfSteps = round(travelLength/epsilon);
  Pose poses[noOfSteps];
  for(int i=0;i<noOfSteps;i++) {
    float phi = normalizeAngle(phi0 + (i+1)*angle/noOfSteps);
-   poses[i] = new Pose(center::x+sin(radians(phi))*radius, center::y+cos(radians(phi))*radius, normalizeAngle(phi-90));
+   poses[i] = Pose(p.scene, center.x+sin(2*M_PI*phi/360)*radius, center.y+cos(2*M_PI*phi/360)*radius, normalizeAngle(phi-90));
  }
- return new Route(noOfSteps,poses,travelLength);
+ vector<Pose> ps(poses, poses + sizeof poses / sizeof poses[0]);
+ return Route(robot, sizeof(poses),ps,travelLength);
 }
 
-Route backwardTurnRightRoute(Pose p, float radius, float angle) {
- ScenePoint center=p::position.klone();
- center.moveRelXRelY(cos(radians(p::direction))*radius, -sin(radians(p::direction))*radius);
- float phi0 = normalizeAngle(p::direction-90);
- float travelLength = radius*radians(angle);
+Route backwardTurnRightRoute(Robot robot, Pose p, float radius, float angle) {
+ Pose center=p.klone();
+ center.moveRelXRelY(cos(2*M_PI*p.direction/360)*radius, -sin(2*M_PI*p.direction/360)*radius);
+ float phi0 = normalizeAngle(p.direction-90);
+ float travelLength = radius*2*M_PI*angle/360;
  int noOfSteps = round(travelLength/epsilon);
  Pose poses[noOfSteps];
  for(int i=0;i<noOfSteps;i++) {
    float phi = normalizeAngle(phi0 - (i+1)*angle/noOfSteps);
-   poses[i] = new Pose(center::x+sin(radians(phi))*radius, center::y+cos(radians(phi))*radius, normalizeAngle(phi+90));
+   poses[i] = Pose(p.scene, center.x+sin(2*M_PI*phi/360)*radius, center.y+cos(2*M_PI*phi/360)*radius, normalizeAngle(phi-90));
  }
- return new Route(noOfSteps,poses,travelLength);
-}
+ vector<Pose> ps(poses, poses + sizeof poses / sizeof poses[0]);
+ return Route(robot, sizeof(poses),ps,travelLength);}
