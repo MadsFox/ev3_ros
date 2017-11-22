@@ -1,3 +1,4 @@
+#pragma once
 #include "ScenePoint.cpp"
 #define _USE_MATH_DEFINES
 #include <math.h>
@@ -13,6 +14,7 @@ class Pose : public ScenePoint {// for a robot
     //Class methods
     Pose klone();// intuitively same as clone, but returns object of right class
     string toString();
+    string getType();
     void moveRelPhiD(float deltaPhi, float deltaDist);  
     void moveAbsPhiD(float phi, float deltaDist);
     bool operator==(Pose po);
@@ -105,6 +107,10 @@ string Pose::toString() {
   ostringstream stm;
   stm << position.toString() << "*phi=" << direction;
   return stm.str();  
+}
+
+string Pose::getType(){
+  return "Pose";
 }
 
 void Pose::moveRelPhiD(float deltaPhi, float deltaDist) {

@@ -138,7 +138,7 @@ add_library(screenPoint include/manuscriptBuilder/ScreenPoint.cpp)
 
 add_library(scenePoint include/manuscriptBuilder/ScenePoint.cpp)
 
-#add_library(manuscriptHelpers include/manuscriptBuilder/ManuscriptHelpers.cpp)
+add_library(manuscriptHelpers include/manuscriptBuilder/ManuscriptHelpers.cpp)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -177,7 +177,7 @@ target_link_libraries(robot ${catkin_LIBRARIES})
 
 target_link_libraries(pose ${catkin_LIBRARIES})
 
-#target_link_libraries(manuscriptHelpers ${catkin_LIBRARIES})
+target_link_libraries(manuscriptHelpers ${catkin_LIBRARIES})
 
 target_link_libraries(event ${catkin_LIBRARIES})
 

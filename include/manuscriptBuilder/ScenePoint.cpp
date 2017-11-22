@@ -1,3 +1,4 @@
+#pragma once
 #include <math.h>
 #include <string>
 #include <sstream>
@@ -12,6 +13,7 @@ class ScenePoint{
     //Class methods
     //ScenePoint klone();
     string toString();
+    string getType();
     bool runaway();
     void moveRelXRelY(float deltaX, float deltaY);
     void moveRelPhiD(float phi, float deltaDist);
@@ -57,6 +59,10 @@ string ScenePoint::toString() {
   ostringstream stm;
   stm << "<" << x << "," << y << "," << scene.sw << "," << scene.sd << ">";
   return stm.str();
+}
+
+string ScenePoint::getType(){
+  return "ScenePoint";
 }
 
 bool ScenePoint::runaway(){return x>scene.hsw||x<-scene.hsw||y>scene.sd||y<0;}

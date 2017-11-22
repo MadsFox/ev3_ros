@@ -1,6 +1,12 @@
+#pragma once
+#include <string>
+
+using namespace std;
+
 class Scene {
   public:
     bool operator==(Scene s);
+    string getType();
     Scene(float sceneWidth, float sceneDepth);
     Scene(const Scene &_scene);
     Scene(){};
@@ -29,4 +35,8 @@ Scene::Scene(const Scene &_scene){
   sw = _scene.sw;
   hsw = _scene.hsw;
   sd = _scene.sd;  
+}
+
+string Scene::getType(){
+  return "Scene";
 }

@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 #include "Robot.cpp"
 #include <iostream>
@@ -11,6 +12,7 @@ class Route {  // find bedre navn
     Route(Robot r, int n, vector<Pose> pp, float td);
     Route(){};
     ~Route();
+    string getType();
     bool operator==(Route r);
     friend Route forwardRoute(Robot robot, Pose from, Pose to);
     friend Route mkBackwardRouteFromBotheEndsINTERNAL(Robot robot, Pose from, Pose to);
@@ -37,6 +39,10 @@ class Route {  // find bedre navn
 };
 
 Route::Route(Robot r, int n, vector<Pose> pp, float td) {robot=r;noOfSteps=n; poses=pp; travelDist=td;}
+
+string Route::getType(){
+  return "Route";
+}
 
 bool Route::operator==(Route r){
   bool equal = false;;

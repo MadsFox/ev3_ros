@@ -1,3 +1,4 @@
+#pragma once
 #include "SceneObject.cpp"
 //#include "Pose.cpp"
 #include <string>
@@ -10,12 +11,15 @@ class Robot : public SceneObject {
     Robot(string t);
     Robot(string t, Pose p);
     Robot(string t, ScenePoint p, float d);
+    Robot(Robot* r);
     Robot(){};
     ~Robot();
     Robot robot(string t);
     Robot robot(string t, Pose p);
     Robot robot(string t, ScenePoint p, float d);
+    string getType();
     bool operator==(Robot r);
+    bool operator==(Robot* r);
     void set(ScenePoint p, float d);
     void set(Pose p);
     //TODO: write method to run motorcommands(mayby this is where ROS publishes)
@@ -59,13 +63,33 @@ Robot::Robot(string t, ScenePoint p, float d) {
   maxSpeed= 1; // m/sec; this version: the same for all robots
 }
 
+Robot::Robot(Robot* r) {
+  topic=r->topic;
+  pose=r->pose;
+  diameter = r->diameter; //meters
+  maxTurn=r->maxTurn; // degrees; this version: the same for all robots
+  maxSpeed=r->maxSpeed; // m/sec; this version: the same for all robots
+  addSceneObject(*this);
+}
+
 // easy constructors
 Robot Robot::robot(string t) {return Robot(t);}
 Robot Robot::robot(string t, Pose p) {return Robot(t, p);}
 Robot Robot::robot(string t, ScenePoint p, float d) {return Robot(t, p, d);}
 
+string Robot::getType(){
+  return "Robot";
+}
+
 bool Robot::operator==(Robot r){
   if(topic == r.topic && pose == r.pose && diameter == r.diameter && maxTurn == r.maxTurn && maxSpeed == r.maxSpeed){
+    return true;
+  }
+  return false;
+}
+
+bool Robot::operator==(Robot* r){
+  if(topic == r->topic && pose == r->pose && diameter == r->diameter && maxTurn == r->maxTurn && maxSpeed == r->maxSpeed){
     return true;
   }
   return false;

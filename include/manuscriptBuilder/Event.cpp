@@ -1,3 +1,4 @@
+#pragma once
 #include "Robot.cpp"
 //#include "Pose.cpp"
 #include <vector>
@@ -13,13 +14,16 @@ class Event {
   public: 
     Event(float tt,Robot rr,Pose pp);
     Event(float tt,Robot rr, float waitingTime);
+//    Event(float tt,Robot rr, float waitingTime);
     Event(){};
     ~Event();
+    string getType();
     int compareTo(Event e);
     string toString();
     void addEvent(Event &e);
-    float timeOfLastGeneratedEvent();
-    float timeOfLastGeneratedEvent(Robot r);
+    friend float timeOfLastGeneratedEvent();
+    friend float timeOfLastGeneratedEvent(Robot r);
+    friend float timeOfLastGeneratedEvent(Robot* r);
     void sortEventList();
     void printEventList();
     void initTime();
@@ -32,8 +36,9 @@ class Event {
     Pose nextPose;  // in nextPose=null, this means a no-event; used for implementing waiting
     float initialMachineTime;
     float simulationTime;
-    std::vector<Event*> eventList;
 };
+
+std::vector<Event*> eventList;
 
 Event::Event(float tt,Robot rr,Pose pp) {time=tt;rob=rr;nextPose=pp.klone();addEvent(*this);}
 
@@ -42,6 +47,10 @@ Event::Event(float tt,Robot rr, float waitingTime) {
   rob=rr;
   nextPose=rr.pose;
   addEvent(*this);
+}
+
+string Event::getType(){
+  return "Event";
 }
 
 int Event::compareTo(Event e) {
@@ -59,19 +68,28 @@ void Event::addEvent(Event &e) {
   eventList.push_back(&e);
 }
 
-float Event::timeOfLastGeneratedEvent() {
+float timeOfLastGeneratedEvent() {
   float t=-1;
   for(int i=0;i<eventList.size();i++)
     if(eventList[i]->time>t) t=eventList[i]->time;
   return t;
 }
 
-float Event::timeOfLastGeneratedEvent(Robot r) {
+float timeOfLastGeneratedEvent(Robot r) {
   float t=-1;
   for(int i=0;i<eventList.size();i++)
     if(eventList[i]->rob==r && eventList[i]->time>t) t=eventList[i]->time;
   return t;
 }
+
+float timeOfLastGeneratedEvent(Robot* r) {
+  float t=-1;
+  for(int i=0;i<eventList.size();i++)
+    if(eventList[i]->rob==r && eventList[i]->time>t) t=eventList[i]->time;
+  return t;
+}
+
+
 void Event::sortEventList() {std::sort(eventList.begin(), eventList.end());}
 
 void Event::printEventList() {for(int i=0;i<eventList.size();i++) cout << eventList[i] << "";}
