@@ -40,6 +40,8 @@ class Route {  // find bedre navn
 
 Route::Route(Robot r, int n, vector<Pose> pp, float td) {robot=r;noOfSteps=n; poses=pp; travelDist=td;}
 
+Route::~Route(){}
+
 string Route::getType(){
   return "Route";
 }

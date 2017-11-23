@@ -6,11 +6,14 @@ using namespace std;
 class Scene {
   public:
     bool operator==(Scene s);
+    void operator=(Scene* s);
     string getType();
     Scene(float sceneWidth, float sceneDepth);
     Scene(const Scene &_scene);
     Scene(){};
     ~Scene();
+    Scene scene(float sceneWidth, float sceneDepth);
+    Scene scene(const Scene &_scene);
 //  private:
     float sw;
     float hsw;
@@ -25,6 +28,12 @@ bool Scene::operator==(Scene s){
   return false;
 }
 
+void Scene::operator=(Scene* s){
+  sw = s->sw;
+  hsw == s->hsw;
+  sd == s->sd;
+}
+
 Scene::Scene(float sceneWidth, float sceneDepth){
   sw = sceneWidth;
   hsw = sceneWidth/2;
@@ -36,6 +45,13 @@ Scene::Scene(const Scene &_scene){
   hsw = _scene.hsw;
   sd = _scene.sd;  
 }
+
+Scene::~Scene(){
+  delete this;
+}
+
+Scene Scene::scene(float sceneWidth, float sceneDepth) {return Scene(sceneWidth, sceneDepth);}
+Scene Scene::scene(const Scene &_scene) {return Scene(_scene);}
 
 string Scene::getType(){
   return "Scene";

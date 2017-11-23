@@ -55,6 +55,10 @@ ScenePoint::ScenePoint(const ScenePoint &_sp){
 //Trying with a copy constructor instead
 //ScenePoint ScenePoint::klone() {return new ScenePoint(scene,x,y);}
 
+ScenePoint::~ScenePoint(){
+  delete this;
+}
+
 string ScenePoint::toString() {
   ostringstream stm;
   stm << "<" << x << "," << y << "," << scene.sw << "," << scene.sd << ">";
@@ -86,7 +90,7 @@ bool ScenePoint::operator==(ScenePoint sp){
 }
 
 // easy constructor
-ScenePoint p(Scene _scene, float x, float y) {return ScenePoint(_scene,x,y);}
+ScenePoint scenePoint(Scene _scene, float x, float y) {return ScenePoint(_scene,x,y);}
 
 ScenePoint avg(Scene _scene, ScenePoint p1, ScenePoint p2) {return ScenePoint(_scene,(p1.x+p2.x)/2,(p1.y+p2.y)/2);}
 

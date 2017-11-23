@@ -150,6 +150,7 @@ add_library(manuscriptHelpers include/manuscriptBuilder/ManuscriptHelpers.cpp)
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(motor_command_pub_test_node src/motor_command_pub_test_node.cpp)
 add_executable(motor_command_pub_keyboard src/motor_command_pub_keyboard.cpp)
+add_executable(manuscript_builder_test src/manuscript_builder_test.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -163,15 +164,10 @@ add_executable(motor_command_pub_keyboard src/motor_command_pub_keyboard.cpp)
 
 add_dependencies(motor_command_pub_test_node ${catkin_EXPORTED_TARGETS})
 add_dependencies(motor_command_pub_keyboard ${catkin_EXPORTED_TARGETS})
+add_dependencies(manuscript_builder_test ${catkin_EXPORTED_TARGETS})
+
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(motor_command_pub_test_node
-  ${catkin_LIBRARIES}
-)
-
-target_link_libraries(motor_command_pub_keyboard
-  ${catkin_LIBRARIES}
-)
 
 target_link_libraries(robot ${catkin_LIBRARIES})
 
@@ -190,6 +186,19 @@ target_link_libraries(sceneObject ${catkin_LIBRARIES})
 target_link_libraries(screenPoint ${catkin_LIBRARIES})
 
 target_link_libraries(scenePoint ${catkin_LIBRARIES})
+
+target_link_libraries(motor_command_pub_test_node
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(motor_command_pub_keyboard
+  ${catkin_LIBRARIES}
+)
+
+target_link_libraries(manuscript_builder_test
+  ${catkin_LIBRARIES}
+)
+
 
 #############
 ## Install ##

@@ -14,9 +14,11 @@ class Event {
   public: 
     Event(float tt,Robot rr,Pose pp);
     Event(float tt,Robot rr, float waitingTime);
+    //Event(float tt,Robot* rr,Pose pp);
 //    Event(float tt,Robot rr, float waitingTime);
     Event(){};
     ~Event();
+    Event event(float tt, Robot rr, Pose pp);
     string getType();
     int compareTo(Event e);
     string toString();
@@ -42,6 +44,8 @@ std::vector<Event*> eventList;
 
 Event::Event(float tt,Robot rr,Pose pp) {time=tt;rob=rr;nextPose=pp.klone();addEvent(*this);}
 
+//Event::Event(float tt,Robot* rr,Pose* pp) {time=tt;rob=rr;nextPose=pp.klone();addEvent(*this);}
+
 Event::Event(float tt,Robot rr, float waitingTime) {
   time=tt+waitingTime;
   rob=rr;
@@ -49,6 +53,10 @@ Event::Event(float tt,Robot rr, float waitingTime) {
   addEvent(*this);
 }
 
+Event::~Event(){}
+
+Event Event::event(float tt,Robot rr,Pose pp){return Event(tt,rr,pp);}
+  
 string Event::getType(){
   return "Event";
 }
@@ -100,9 +108,10 @@ float Event::currentSimulationTime() {return (((float)clock()/CLOCKS_PER_SEC)-in
 
 void Event::executeCurrentEvents() {
   float t= currentSimulationTime();
- // println("executeCurrentEvents() at sim. time "+t+", remaining events: " +eventList.size());
+  cout << "executeCurrentEvents() at sim. time " << t << ", remaining events: " << eventList.size();
   while(eventList.size()>0 && eventList[0]->time<t) {
-    if(!(eventList[0]->nextPose==eventList[0]->rob.pose)) eventList[0]->rob.pose=eventList[0]->nextPose;
+    if(!(eventList[0]->nextPose==eventList[0]->rob.pose)) {
+      eventList[0]->rob.pose=eventList[0]->nextPose;}
     eventList.erase(eventList.begin());}
 }
 

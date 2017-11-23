@@ -17,7 +17,11 @@ class Pose : public ScenePoint {// for a robot
     string getType();
     void moveRelPhiD(float deltaPhi, float deltaDist);  
     void moveAbsPhiD(float phi, float deltaDist);
+    Pose pose(float width, float depth, float xx, float yy, float dd);
+    Pose pose(Scene _scene, float xx, float yy, float dd);
+    Pose pose(ScenePoint ss, float dd);
     bool operator==(Pose po);
+    void operator=(Pose* po);
     friend Pose pose(Scene scene, float x, float y, float d);
     friend Pose avgPose(Scene scene, Pose p1, Pose p2);
     friend float normalizeAngle(float phi);
@@ -26,6 +30,7 @@ class Pose : public ScenePoint {// for a robot
     friend float dist(Pose p1, ScenePoint p2);
     friend float dist(ScenePoint p1, Pose p2);
     //Constructors
+    Pose(float width, float depth, float xx, float yy, float dd);
     Pose(Scene _scene, float xx, float yy, float dd);
     Pose(ScenePoint ss, float dd);
     Pose(){};
@@ -58,6 +63,28 @@ class Pose : public ScenePoint {// for a robot
     // Currently only used for checking feasibility of generated route
     // in mkXXXXXRouteXXXX; should be correlated with constant epsilon and expected robot diameter
 };
+
+Pose::Pose(float width, float depth, float xx, float yy, float dd) {
+  scene = Scene(width, depth);
+  position = ScenePoint(scene,xx,yy); direction=dd;
+  north = 0;
+  east = 90;
+  south = 180;
+  west = 270;
+  northEast = north+90/2;
+  southEast = south-90/2;
+  northWest=west+90/2;
+  southWest=west-90/2;
+  nne=north+90/4;
+  ene=east-90/4;
+  ese=east+90/4;
+  sse=south-90/4;
+  ssw=south+90/4;
+  wsw=west-90/4;
+  wnw=west+90/4;
+  nnw=360-90/4;
+  robotTurningDiameter = 0.7;
+}
 
 Pose::Pose(Scene _scene, float xx, float yy, float dd) {
   position = ScenePoint(_scene,xx,yy); direction=dd;
@@ -101,6 +128,13 @@ Pose::Pose(ScenePoint ss, float dd) {
   robotTurningDiameter = 0.7;
 }
 
+Pose Pose::pose(float width, float depth, float xx, float yy, float dd){return Pose(width, depth, xx, yy, dd);}
+Pose Pose::pose(Scene scene, float xx, float yy, float dd){return Pose(scene, xx, yy, dd);}
+Pose Pose::pose(ScenePoint ss, float dd){return Pose(ss, dd);}
+
+
+Pose::~Pose(){}
+
 Pose Pose::klone() {return Pose(ScenePoint(position),direction);} // intuitively same as clone, but returns object of right class
 
 string Pose::toString() {
@@ -133,7 +167,12 @@ bool Pose::operator==(Pose po){
     return true;
   }
   return false;
-}    
+} 
+
+void Pose::operator=(Pose* po){
+  position = po->position;
+  direction = po->direction;
+}   
 
 // easy constructor:
 Pose pose(Scene scene, float x, float y, float d) {return Pose(scene, x,y,d);}

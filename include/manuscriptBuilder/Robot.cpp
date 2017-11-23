@@ -9,17 +9,18 @@ using namespace std;
 class Robot : public SceneObject {
   public:
     Robot(string t);
-    Robot(string t, Pose p);
+    Robot(string t, Pose* p);
     Robot(string t, ScenePoint p, float d);
     Robot(Robot* r);
     Robot(){};
     ~Robot();
     Robot robot(string t);
-    Robot robot(string t, Pose p);
+//    Robot robot(string t, Pose p);
     Robot robot(string t, ScenePoint p, float d);
     string getType();
     bool operator==(Robot r);
     bool operator==(Robot* r);
+    void operator=(Robot* r);
     void set(ScenePoint p, float d);
     void set(Pose p);
     //TODO: write method to run motorcommands(mayby this is where ROS publishes)
@@ -30,6 +31,7 @@ class Robot : public SceneObject {
     bool runaway();
     void publishWarningFrame();
     void publishWarningOnEdges();
+    string toString();
 //  private:
     Pose pose;
     float diameter; //meters
@@ -45,7 +47,7 @@ Robot::Robot(string t) {
   maxSpeed= 1; // m/sec; this version: the same for all robots
 }
 
-Robot::Robot(string t, Pose p) {
+Robot::Robot(string t, Pose* p) {
   topic=t;
   pose=p;
   addSceneObject(*this);
@@ -72,10 +74,12 @@ Robot::Robot(Robot* r) {
   addSceneObject(*this);
 }
 
+Robot::~Robot(){}
+
 // easy constructors
-Robot Robot::robot(string t) {return Robot(t);}
-Robot Robot::robot(string t, Pose p) {return Robot(t, p);}
-Robot Robot::robot(string t, ScenePoint p, float d) {return Robot(t, p, d);}
+Robot Robot::robot(string t) {return new Robot(t);}
+//Robot Robot::robot(string t, Pose p) {return new Robot(t, p);}
+Robot Robot::robot(string t, ScenePoint p, float d) {return new Robot(t, p, d);}
 
 string Robot::getType(){
   return "Robot";
@@ -93,6 +97,14 @@ bool Robot::operator==(Robot* r){
     return true;
   }
   return false;
+}
+
+void Robot::operator=(Robot* r){
+  topic == r->topic;
+  pose == r->pose;
+  diameter == r->diameter; 
+  maxTurn == r->maxTurn;
+  maxSpeed == r->maxSpeed;
 }
 
 void Robot::set(ScenePoint p, float d) {pose = Pose(p,d);}
@@ -123,10 +135,10 @@ bool Robot::overlappingOther() {
   float r=diameter/2;
   bool result=false;
   for(int i=0;i<allSceneObjects.size();i++) if(allSceneObjects[i]!=this) {
-    if( allSceneObjects[i]->hasInside(p(s, x+r,y+r)) ) result=true;
-    if( allSceneObjects[i]->hasInside(p(s, x-r,y+r)) ) result=true;
-    if( allSceneObjects[i]->hasInside(p(s, x+r,y-r)) ) result=true;
-    if( allSceneObjects[i]->hasInside(p(s, x-r,y-r)) ) result=true;
+    if( allSceneObjects[i]->hasInside(scenePoint(s, x+r,y+r)) ) result=true;
+    if( allSceneObjects[i]->hasInside(scenePoint(s, x-r,y+r)) ) result=true;
+    if( allSceneObjects[i]->hasInside(scenePoint(s, x+r,y-r)) ) result=true;
+    if( allSceneObjects[i]->hasInside(scenePoint(s, x-r,y-r)) ) result=true;
  } 
  return result;
 }
@@ -136,10 +148,10 @@ bool Robot::runaway() {
   float x=pose.position.x; float y=pose.position.y;
   float r=diameter/2;
   bool result = false;
-  if(p(s, x+r,y+r).runaway()) result=true;
-  if(p(s, x-r,y+r).runaway()) result=true;
-  if(p(s, x+r,y-r).runaway()) result=true;
-  if(p(s, x-r,y-r).runaway()) result=true;
+  if(scenePoint(s, x+r,y+r).runaway()) result=true;
+  if(scenePoint(s, x-r,y+r).runaway()) result=true;
+  if(scenePoint(s, x+r,y-r).runaway()) result=true;
+  if(scenePoint(s, x-r,y-r).runaway()) result=true;
   return result;
 }
 
@@ -151,3 +163,8 @@ void Robot::publishWarningOnEdges() {
   cout << topic + " has left the building";
 }
 
+string Robot::toString() {
+  ostringstream stm;
+  stm << "Robot: " << topic << " - position: " << pose.toString() << ", diameter: " << diameter << ", maxTurn: " << maxTurn << ", maxSpeed: " << maxSpeed;
+  return stm.str();  
+}
