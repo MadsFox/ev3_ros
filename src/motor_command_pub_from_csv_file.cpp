@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
     char str[256];
     //vector for all the data in the csv file.
     vector< vector<string> > fileData;
-map<string, ros::Publisher> robotPub;
+map<string, double/*ros::Publisher*/> robotPub;
 
     //ask in terminal for CSV file 
     cout << "Enter URI of motorCommand .csv file: ";
@@ -42,7 +42,7 @@ map<string, ros::Publisher> robotPub;
         while(ss){
             string s;
             if(!getline(ss,s,',')) break;
-            record.push_back(s);
+            record.push_back(s.substr(1, s.length()-2));
             counter++;
         }
         fileData.push_back(record);
@@ -54,7 +54,7 @@ map<string, ros::Publisher> robotPub;
     ros::init(argc, argv, "motor_command_pub_from_csv_file");
 
     //new nodehandler to send commands
-    ros::NodeHandle n;
+    //ros::NodeHandle n;
     
     for(vector< vector<string> >::iterator it = fileData.begin(); it != fileData.end(); ++it){
         //cout << it->at(0).c_str() << endl;
@@ -64,15 +64,18 @@ map<string, ros::Publisher> robotPub;
             cout << "header line" << endl;
         }else if (name.compare("name") != 0){
             if(robotPub.find(name) != robotPub.end()){
-                cout << name << " is already known" << endl;
-            }else{
                 cout << "new robot by the name: " << name << endl;
-                
-                robotPub.insert(pair<string, ros::Publisher>(name, n.advertise<MotorCommands>(name, 1000)));
+            }else{
+                cout << name << " is already known" << endl;
+                double startT = stod(startTime);
+                robotPub.insert(pair<string, double/*ros::Publisher*/>(name, startT/*n.advertise<MotorCommands>(name, 1000)*/));
             
             }
         }
     }
+
+    //TODO: convert strings to double www.cplusplus.com/reference/string/stod/
+    //TODO: remove qoutes from values.
     
     return 0;
 
