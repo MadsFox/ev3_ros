@@ -149,6 +149,7 @@ add_library(manuscriptHelpers include/manuscriptBuilder/ManuscriptHelpers.cpp)
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(motor_command_pub_test_node src/motor_command_pub_test_node.cpp)
+add_executable(motor_command_pub_from_csv_file src/motor_command_pub_from_csv_file.cpp)
 add_executable(motor_command_pub_keyboard src/motor_command_pub_keyboard.cpp)
 add_executable(manuscript_builder_test src/manuscript_builder_test.cpp)
 
@@ -163,6 +164,7 @@ add_executable(manuscript_builder_test src/manuscript_builder_test.cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 add_dependencies(motor_command_pub_test_node ${catkin_EXPORTED_TARGETS})
+add_dependencies(motor_command_pub_from_csv_file ${catkin_EXPORTED_TARGETS})
 add_dependencies(motor_command_pub_keyboard ${catkin_EXPORTED_TARGETS})
 add_dependencies(manuscript_builder_test ${catkin_EXPORTED_TARGETS})
 
