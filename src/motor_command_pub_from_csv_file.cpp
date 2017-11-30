@@ -67,7 +67,7 @@ map<string, double/*ros::Publisher*/> robotPub;
                 cout << "new robot by the name: " << name << endl;
             }else{
                 cout << name << " is already known" << endl;
-                double startT = stod(startTime);
+                double startT = stod(startTime, );
                 robotPub.insert(pair<string, double/*ros::Publisher*/>(name, startT/*n.advertise<MotorCommands>(name, 1000)*/));
             
             }
