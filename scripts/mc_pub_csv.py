@@ -7,6 +7,7 @@ import os
 from std_msgs.msg import String
 from ev3_ros.msg import MotorCommands
 
+
 def readInCsv():
     global robotNames
     robotNames = {}
@@ -29,22 +30,23 @@ def readInCsv():
                                                                 }
                                                            }
                                            }
-                print(row["name"] + " has been added")
+                print(row["name"], " has been added at: ",round(float(row["startTime"]), 2) , " with motor speeds: ", float(row["rightMotorSpeed"]))
             else:
-                robotNames[row["name"]]["commandDict"] = {round(float(row["startTime"]), 2):
-                                                              {"start_time": float(row["startTime"]),
-                                                               "end_time": float(row["endTime"]),
-                                                               "right_speed": float(row["rightMotorSpeed"]),
-                                                               "left_speed": float(row["leftMotorSpeed"])
-                                                               }
-                                                          }
+                robotNames[row["name"]]["commandDict"][round(float(row["startTime"]), 2)] = {
+                    "start_time": float(row["startTime"]),
+                    "end_time": float(row["endTime"]),
+                    "right_speed": float(row["rightMotorSpeed"]),
+                    "left_speed": float(row["leftMotorSpeed"])
+                    }
+                print(row["name"], " new motor speeds at: ",round(float(row["startTime"]), 2) , " with motor speeds: ", float(row["rightMotorSpeed"]))
 
     return filePath
 
-def mc_pub_csv(file):
+
+def mc_pub_csv():
     pub = rospy.Publisher('default', MotorCommands, queue_size=10)
     rospy.init_node('mc_pub_csv', anonymous=True)
-    rate = rospy.Rate(10) # 10hz
+    rate = rospy.Rate(100) # 10hz
 
     #reader = csv.DictReader(csvFile)
 
@@ -52,8 +54,6 @@ def mc_pub_csv(file):
     mc.right_speed = 0
     mc.left_speed = 0
     rospy.loginfo(mc)
-
-    print(file)
 
     start = raw_input("start the dance: (y/n)")
     while "y" not in start:
@@ -64,42 +64,37 @@ def mc_pub_csv(file):
     start_time = time.clock()
 
     while not rospy.is_shutdown():
+        time_diff = time.clock() - start_time
+
         for robot in robotNames:
 
-            current_time = time.clock() - start_time
+            #print(" current_time: ", round(current_time,2),
+            #      "robot: ", robot,
+            #      " startTime: ", robotNames[robot]["commandDict"])
+            if round(float(time_diff), 2) in robotNames[robot]["commandDict"]:
+                #print(" startTime: ", robotNames[robot]["commandDict"],
+                #      " pub: ", robotNames[robot]["pub"],
+                #      " mc.right_speed: ", robotNames[robot]["commandDict"][round(current_time, 2)]["right_speed"],
+                #      " mc.left_speed: ", robotNames[robot]["commandDict"][round(current_time, 2)]["left_speed"]
+                #      )
+                print("New speed for Robot: ", robot, "")
+                pub = robotNames[robot]["pub"]
+                mc.right_speed = robotNames[robot]["commandDict"][round(time_diff, 2)]["right_speed"]
+                mc.left_speed = robotNames[robot]["commandDict"][round(time_diff, 2)]["left_speed"]
 
-            print(" current_time: ", round(current_time,2),
-                  "robot: ", robot)
-            if round(current_time,2) in robotNames[robot]["commandDict"]:
-                print("file is here")
-                print(" startTime: ", robotNames[robot]["commandDict"][round(current_time,2)]["startTime"],
-                        #" endTime: ", robot["commandDict"][current_time]["endTime"],
-                        #" right_speed: ", robot["commandDict"][current_time]["right_speed"],
-                        #" left_speed: ", robot["commandDict"][current_time]["left_speed"],
-                        )
+            rospy.loginfo(mc)
+            pub.publish(mc)
+            rate.sleep()
 
-            #if row["startTime"] < current_time and current_time < row["endTime"] and rospy.is_running():
-            #    current_time = time.clock() - start_time
-            #    pub = robotNames[row["name"]]
-            #    mc.right_speed = row["rightMotorSpeed"]
-            #    mc.left_speed = row["leftMotorSpeed"]
-            #
-            #    prevRow = row
-            #    prevRow1 = prevRow
-            #    prevRow2 = prevRow1
-            #
-            #rospy.loginfo(mc)
-            #pub.publish(mc)
-            #rate.sleep()
 
 if __name__ == '__main__':
     try:
-        fp = readInCsv()
+        readInCsv()
     except Exception:
         print(Exception)
         pass
 
     try:
-        mc_pub_csv(fp)
+        mc_pub_csv()
     except rospy.ROSInterruptException:
         pass
