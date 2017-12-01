@@ -46,24 +46,32 @@ def readInCsv():
 def mc_pub_csv():
     pub = rospy.Publisher('default', MotorCommands, queue_size=10)
     rospy.init_node('mc_pub_csv', anonymous=True)
-    rate = rospy.Rate(100) # 10hz
+    rate = rospy.Rate(10) # 10hz
 
     #reader = csv.DictReader(csvFile)
 
-    mc = MotorCommands()
-    mc.right_speed = 0
-    mc.left_speed = 0
-    rospy.loginfo(mc)
+    for robot in robotNames:
+        pub = robotNames[robot]["pub"]
+        mc = MotorCommands()
+        mc.right_speed = 0
+        mc.left_speed = 0
+        pub.publish(mc)
+        rospy.loginfo(mc)
+        rate.sleep()
 
-    start = raw_input("start the dance: (y/n)")
-    while "y" not in start:
-        if "n" in start:
-            exit(0)
-        start = raw_input("start the dance: (y/n)")
-
+    start = ""
+    first = True;
     start_time = time.clock()
 
     while not rospy.is_shutdown():
+        while "y" not in start:
+            if "n" in start:
+                exit(0)
+            start = raw_input("start the dance: (y/n)")
+        if "y" in start and not first:
+            start_time = time.clock()
+            first = False
+
         time_diff = time.clock() - start_time
 
         for robot in robotNames:
@@ -71,16 +79,16 @@ def mc_pub_csv():
             #print(" current_time: ", round(current_time,2),
             #      "robot: ", robot,
             #      " startTime: ", robotNames[robot]["commandDict"])
-            if round(float(time_diff), 2) in robotNames[robot]["commandDict"]:
+            if (round(float(time_diff), 4)*100) in robotNames[robot]["commandDict"]:
                 #print(" startTime: ", robotNames[robot]["commandDict"],
                 #      " pub: ", robotNames[robot]["pub"],
                 #      " mc.right_speed: ", robotNames[robot]["commandDict"][round(current_time, 2)]["right_speed"],
                 #      " mc.left_speed: ", robotNames[robot]["commandDict"][round(current_time, 2)]["left_speed"]
                 #      )
-                print("New speed for Robot: ", robot, "")
                 pub = robotNames[robot]["pub"]
-                mc.right_speed = robotNames[robot]["commandDict"][round(time_diff, 2)]["right_speed"]
-                mc.left_speed = robotNames[robot]["commandDict"][round(time_diff, 2)]["left_speed"]
+                mc.right_speed = robotNames[robot]["commandDict"][(round(float(time_diff), 4)*100)]["right_speed"]
+                mc.left_speed = robotNames[robot]["commandDict"][(round(float(time_diff), 4)*100)]["left_speed"]
+                print("New speed at time: ", time.clock(), " for Robot: ", robot, " with pub: ", pub, " rs: ", mc.right_speed, " ls: ", mc.left_speed)
 
             rospy.loginfo(mc)
             pub.publish(mc)
