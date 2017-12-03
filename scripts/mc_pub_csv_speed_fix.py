@@ -30,8 +30,7 @@ def readInCsv():
                                                                 }
                                                            }
                                            }
-                print(row["name"], " has been added at: ", round(float(row["startTime"]), 2), " with motor speeds: ",
-                      float(row["rightMotorSpeed"]), float(row["leftMotorSpeed"]))
+                print(row["name"], " has been added at: ", round(float(row["startTime"]), 2), " with motor speeds: ", float(row["rightMotorSpeed"]), float(row["leftMotorSpeed"]))
             else:
                 robotNames[row["name"]]["commandDict"][round(float(row["startTime"]), 2)] = {
                     "start_time": float(row["startTime"]),
@@ -39,8 +38,7 @@ def readInCsv():
                     "right_speed": float(row["rightMotorSpeed"]),
                     "left_speed": float(row["leftMotorSpeed"])
                     }
-                print(row["name"], " has been added at: ", round(float(row["startTime"]), 2), " with motor speeds: ",
-                      float(row["rightMotorSpeed"]), float(row["leftMotorSpeed"]))
+                print(row["name"], " new motor speeds at: ", round(float(row["startTime"]), 2), " with motor speeds: ", float(row["rightMotorSpeed"]), float(row["leftMotorSpeed"]))
 
     return filePath
 
@@ -92,12 +90,17 @@ def mc_pub_csv():
                 pub = robotNames[robot]["pub"]
                 right_speed = robotNames[robot]["commandDict"][(round(float(time_diff), 4)*100)]["right_speed"]
                 left_speed = robotNames[robot]["commandDict"][(round(float(time_diff), 4)*100)]["left_speed"]
-                right_speed = max(-1, min(right_speed, 1))
-                left_speed = max(-1, min(left_speed, 1))
+                #right_speed = max(-1, min(right_speed, 1))
+                #left_speed = max(-1, min(left_speed, 1))
+                while right_speed < 0.1:
+                    right_speed = right_speed * 10
+                while left_speed < 0.1:
+                    left_speed = left_speed * 10
                 mc.right_speed = right_speed
                 mc.left_speed = left_speed
                 print("time diff: ", (round(float(time_diff), 4)*100))
                 print("New speed at time: ", time.clock(), " for Robot: ", robot, " with pub: ", pub, " rs: ", mc.right_speed, " ls: ", mc.left_speed)
+
 
             rospy.loginfo(mc)
             pub.publish(mc)
