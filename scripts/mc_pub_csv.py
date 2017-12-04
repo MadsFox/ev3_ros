@@ -86,12 +86,20 @@ def mc_pub_csv():
                 #      " mc.left_speed: ", robotNames[robot]["commandDict"][round(current_time, 2)]["left_speed"]
                 #      )
                 pub = robotNames[robot]["pub"]
-                mc.right_speed = robotNames[robot]["commandDict"][(round(float(time_diff), 4)*100)]["right_speed"]
-                mc.left_speed = robotNames[robot]["commandDict"][(round(float(time_diff), 4)*100)]["left_speed"]
+                right_speed = robotNames[robot]["commandDict"][(round(float(time_diff), 4)*100)]["right_speed"]
+                left_speed = robotNames[robot]["commandDict"][(round(float(time_diff), 4)*100)]["left_speed"]
+                right_speed = max(-1, min(right_speed, 1))
+                left_speed = max(-1, min(left_speed, 1))
+                mc.right_speed = right_speed
+                mc.left_speed = left_speed
                 print("New speed at time: ", time.clock(), " for Robot: ", robot, " with pub: ", pub, " rs: ", mc.right_speed, " ls: ", mc.left_speed)
 
+                if (round(float(time_diff), 4) * 100) not in robotNames[robot]["commandDict"]:
+                    mc.right_speed = 0
+                    mc.left_speed = 0
+
             rospy.loginfo(mc)
-            pub.publish(mc)
+            #pub.publish(mc)
             rate.sleep()
 
 
