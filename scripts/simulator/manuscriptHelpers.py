@@ -14,7 +14,7 @@ void moveTo(Robot r, float startTime, Pose to) {
   Route route = forwardRoute(mostRecentRecordedPose[indexOf(r)], to);
   mostRecentRecordedPose[indexOf(r)]=to;
   // arbitrary speed in this version
-  for(int i=0;i<route.noOfSteps;i++) new Event(startTime+float(i)/50,r,route.poses[i]); //<>//
+  for(int i=0;i<route.noOfSteps;i++) new Event(startTime+float(i)/50,r,route.poses[i]);
 }
 
 void moveTo(Robot r, Pose to) {moveTo(r,timeOfLastGeneratedEvent(r),to);}

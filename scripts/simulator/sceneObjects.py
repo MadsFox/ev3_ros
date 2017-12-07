@@ -1,33 +1,38 @@
-class SceneObject:
-  name = "";
+class SceneObject {
+  String name;
+  color col;
+  void draw() {;} // to be overridden  
+  boolean hasInside(ScenePoint sp) {return false;} // to be overridden (when relevant)
+  boolean hasInside(Pose p) {return hasInside(p.position);}
+}
 
-  def __init__(self, name):
-    self.name = name
+SceneObject [] allSceneObjects = new SceneObject[0];
 
-  def has_inside(self, sp):
-    return False
+void drawAllSceneObjects() {
+ for(int i=0;i<allSceneObjects.length;i++) if(allSceneObjects[i] instanceof RestrictedArea)allSceneObjects[i].draw();
+ for(int i=0;i<allSceneObjects.length;i++) if(allSceneObjects[i] instanceof Grid)allSceneObjects[i].draw();
+ for(int i=0;i<allSceneObjects.length;i++) if(allSceneObjects[i] instanceof ReferencePoint)allSceneObjects[i].draw();
+ for(int i=0;i<allSceneObjects.length;i++) if(allSceneObjects[i] instanceof Robot)allSceneObjects[i].draw();}
 
-  def has_inside(self, p):
-    return self.has_inside(p)
+int indexOf(SceneObject so) {
+  for(int i=0;i<allSceneObjects.length;i++) if(allSceneObjects[i]==so)return i;
+  return -1;
+}
 
-allSceneObjects = []
+void addSceneObject(SceneObject so) {
+  SceneObject [] old = allSceneObjects;
+  allSceneObjects = new SceneObject[old.length+1];
+  for(int i=0;i<old.length;i++)allSceneObjects[i]=old[i];
+  allSceneObjects[old.length]=so;
+}
 
-def index_of(so):
-  if so in allSceneObjects:
-      return allSceneObjects.index(so)
-  else:
-    return -1
 
+float maxTurn=35; // degrees; this version: the same for all robots
+float maxSpeed= 1; // m/sec; this version: the same for all robots
 
-def addSceneObject(so):
-  allSceneObjects.append(so)
-
-maxTurn=35; # degrees; this version: the same for all robots
-maxSpeed= 1; # m/sec; this version: the same for all robots
-
-class Robot(SceneObject):
-  pose = Pose();
-  diameter = 0.3; //meters
+class Robot extends SceneObject{
+  Pose pose;
+  float diameter = 0.3; //meters
 
   Robot(String n, color c) {name=n;col=c;addSceneObject(this);}
   
@@ -121,14 +126,6 @@ class Robot(SceneObject):
     if(x1<0 && y1<0) {rect(1,1,5,5);}
     if(x2>width && y1<0) {rect(width-5-1,1,5,5);}
   }
-  @ Override
-  String toString(){
-    try{
-      return name + " at Pose: " + pose.toString();
-    }catch(Exception e){
-      return name + " at Pose: ";
-    }
-  }
 }
 // easy constructors
 Robot robot(String n, color c) {return new Robot(n, c);}
@@ -217,19 +214,3 @@ Grid grid(color c, float r) {return new Grid(c,r);}
 Grid grid(float r) {return new Grid(r);}
 Grid grid(color c) {return new Grid();}
 Grid grid() {return new Grid();}
-
-class PosePoint extends SceneObject{
-  ScenePoint sp;
-  float diameter;
-
-  PosePoint(color c, ScenePoint scpo, float d){name="PosePoint";col=c;sp=scpo;diameter=d;addSceneObject(this);}
-  PosePoint(ScenePoint scpo, float d){name="PosePoint";col=color(255,0,0);sp=scpo;diameter=d;addSceneObject(this);}
-  @ Override
-  void draw(){
-    stroke(col);strokeWeight(1);
-    ellipse(sp.x, sp.y, diameter, diameter);
-  }
-}
-
-PosePoint posePoint(color c, ScenePoint scpo, float d){return new PosePoint(c, scpo, d);}
-PosePoint posePoint(color c, float x, float y, float d){return new PosePoint(c, new ScenePoint(x, y), d);}
