@@ -1,23 +1,15 @@
-float sceneWidth = 10; //meters
-float sceneDepth = 5; //meters
+#!/usr/bin/env python
 
-String scriptFileName = "hubahop";
+from CoordinatesAndUnits import *
 
-void setup() {
-  // the following should preserve the proportions of (sceneWidth,sceneDepth);
-  size(2000,1000);
-  frameRate(24);
-  background(51);
-  manuscript();
-  sortEventList(); // IMPORTANT!!!!
-  //printEventList();
-  initTime();
-}
+sceneWidth = 10 #meters
+sceneDepth = 5 #meters
 
-void draw() {
-  background(51);
-  executeCurrentEvents();
-  drawAllSceneObjects();
-//////  saveFrame("frames/"+(frameCount<1000?"0":"")+(frameCount<100?"0":"")+(frameCount<10?"0":"")+frameCount+".png");
-  if(noMoreEvents()) noLoop();
-}
+scriptFileName = "hubahop"
+
+if __name__ == "__main__":
+  # the following should preserve the proportions of (sceneWidth,sceneDepth)
+  manuscript()
+  sortEventList() # IMPORTANT!!!!
+  #printEventList()
+  initTime()
