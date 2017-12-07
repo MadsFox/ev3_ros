@@ -1,38 +1,33 @@
-class SceneObject {
-  String name;
-  color col;
-  void draw() {;} // to be overridden  
-  boolean hasInside(ScenePoint sp) {return false;} // to be overridden (when relevant)
-  boolean hasInside(Pose p) {return hasInside(p.position);}
-}
+class SceneObject:
+  name = "";
 
-SceneObject [] allSceneObjects = new SceneObject[0];
+  def __init__(self, name):
+    self.name = name
 
-void drawAllSceneObjects() {
- for(int i=0;i<allSceneObjects.length;i++) if(allSceneObjects[i] instanceof RestrictedArea)allSceneObjects[i].draw();
- for(int i=0;i<allSceneObjects.length;i++) if(allSceneObjects[i] instanceof Grid)allSceneObjects[i].draw();
- for(int i=0;i<allSceneObjects.length;i++) if(allSceneObjects[i] instanceof ReferencePoint)allSceneObjects[i].draw();
- for(int i=0;i<allSceneObjects.length;i++) if(allSceneObjects[i] instanceof Robot)allSceneObjects[i].draw();}
+  def has_inside(self, sp):
+    return False
 
-int indexOf(SceneObject so) {
-  for(int i=0;i<allSceneObjects.length;i++) if(allSceneObjects[i]==so)return i;
-  return -1;
-}
+  def has_inside(self, p):
+    return self.has_inside(p)
 
-void addSceneObject(SceneObject so) {
-  SceneObject [] old = allSceneObjects;
-  allSceneObjects = new SceneObject[old.length+1];
-  for(int i=0;i<old.length;i++)allSceneObjects[i]=old[i];
-  allSceneObjects[old.length]=so;
-}
+allSceneObjects = []
+
+def index_of(so):
+  if so in allSceneObjects:
+      return allSceneObjects.index(so)
+  else:
+    return -1
 
 
-float maxTurn=35; // degrees; this version: the same for all robots
-float maxSpeed= 1; // m/sec; this version: the same for all robots
+def addSceneObject(so):
+  allSceneObjects.append(so)
 
-class Robot extends SceneObject{
-  Pose pose;
-  float diameter = 0.3; //meters
+maxTurn=35; # degrees; this version: the same for all robots
+maxSpeed= 1; # m/sec; this version: the same for all robots
+
+class Robot(SceneObject):
+  pose = Pose();
+  diameter = 0.3; //meters
 
   Robot(String n, color c) {name=n;col=c;addSceneObject(this);}
   

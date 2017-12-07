@@ -1,9 +1,8 @@
-// scene coordinate system //<>// //<>//
-//    x-axis front edge of scene shown in bottom of screen window
-//     and with zero in the middle
-//    y-axis points into the scene; zero at front edge of scene
-
-// internal units are meters
+# scene coordinate system //<>// //<>//
+#    x-axis front edge of scene shown in bottom of screen window
+#     and with zero in the middle
+#    y-axis points into the scene; zero at front edge of scene
+# internal units are meters
 
 float m=1;
 float sw=sceneWidth;
