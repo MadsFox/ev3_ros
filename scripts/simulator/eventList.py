@@ -1,62 +1,89 @@
-// keep track of all events prescribed by manuscript and make it possible for "draw" to execute it;
-// haha, den skal da bruge absolut tid !!!!
+#!/usr/bin/env python
 
-import java.util.*;
+from time import *
+from CoordinatesAndUnits import *
+from sceneObjects import *
 
-class Event implements Comparable {
-  float time; // seconds from beginning of story
-  Robot rob;
-  Pose nextPose;  // in nextPose=null, this means a no-event; used for implementing waiting
-  
-  Event(float tt,Robot rr,Pose pp) {time=tt;rob=rr;nextPose=pp.klone();eventList.add(this);}
 
-  Event(float tt,Robot rr, float waitingTime) {time=tt+waitingTime;rob=rr;nextPose=null;eventList.add(this);}
-  
-  @Override
-  public int compareTo(Object e) {
-    float d= time - ((Event)e).time;
-    if(d<0) return -1; if(d>0) return 1; return 0;
-  }
-  
-  @Override
-  String toString() {return time+": "+rob.name+nextPose;}
+# keep track of all events prescribed by manuscript and make it possible for "draw" to execute it
+# haha, den skal da bruge absolut tid !!!!
 
-}
+class Event:
+    time = 0  # seconds from beginning of story
+    rob = Robot
+    nextPose = Pose  # in nextPose=null, self means a no-event used for implementing waiting
 
-ArrayList<Event> eventList = new ArrayList<Event>();
+    def __init__(self, tt, rr, *args, **kwargs):
+        self.time = tt
+        self.rob = rr
+        if "pp" in kwargs:
+            self.nextPose = kwargs.get("pp").klone()
+        elif "waitingTime" in kwargs:
+            self.time = tt + kwargs.get("waitingTime")
+            self.nextPose = None
+        eventList.add(self)
 
-float timeOfLastGeneratedEvent() {
-  float t=-1;
-  for(int i=0;i<eventList.size();i++)
-    if(eventList.get(i).time>t) t=eventList.get(i).time;
-  return t;
-}
+    def compareTo(self, e):
+        d = self.time - e.time
+        if d < 0:
+            return -1
+        elif d > 0:
+            return 1
+        return 0
 
-float timeOfLastGeneratedEvent(Robot r) {
-  float t=-1;
-  for(int i=0;i<eventList.size();i++)
-    if(eventList.get(i).rob==r && eventList.get(i).time>t) t=eventList.get(i).time;
-  return t;
-}
-void sortEventList() {Collections.sort(eventList);}
+    def toString(self):
+        return self.time + ": " + self.rob.name + self.nextPose
 
-void printEventList() {for(int i=0;i<eventList.size();i++) println(eventList.get(i)+"");}
 
-int initialMachineTime;
+eventList = []
 
-float simulationTime;
 
-void initTime() {initialMachineTime = millis();}
+def timeOfLastGeneratedEvent():
+    t = -1
+    for i in eventList:
+        if (i.time in eventList) < t:
+            t = eventList[i].time
+    return t
 
-float currentSimulationTime() {return ((float)(millis()-initialMachineTime))/1000;}
 
-void executeCurrentEvents() {
-  float t= currentSimulationTime();
- // println("executeCurrentEvents() at sim. time "+t+", remaining events: " +eventList.size());
-  while(eventList.size()>0 && eventList.get(0).time<t) {
-    if(eventList.get(0).nextPose!=null) eventList.get(0).rob.pose=eventList.get(0).nextPose;
-    eventList.remove(0);}
-}
+def timeOfLastGeneratedEvent(r):
+    t = -1
+    for i in eventList:
+        if eventList[i].rob == r and eventList[i].time > t:
+            t = eventList[i].time
+    return t
 
-boolean noMoreEvents() {return eventList.isEmpty();}
-  
+
+def sortEventList():
+    eventList.sort()
+
+
+def printEventList():
+    for i in eventList:
+        print(eventList[i] + "")
+
+
+initialMachineTime = 0
+
+simulationTime = 0
+
+
+def initTime():
+    initialMachineTime = time.clock()
+
+
+def currentSimulationTime():
+    return (time.clock() - initialMachineTime) / 1000
+
+
+def executeCurrentEvents():
+    t = currentSimulationTime()
+    # println("executeCurrentEvents() at sim. time "+t+", remaining events: " +eventList.size())
+    while len(eventList) > 0 and eventList[0].time < t:
+        if eventList[0].nextPose is not None:
+            eventList[0].rob.pose = eventList[0].nextPose
+        del eventList[0]
+
+
+def noMoreEvents():
+    return eventList.isEmpty()

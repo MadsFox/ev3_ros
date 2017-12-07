@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from simulator import *
+from math import *
 
 # scene coordinate system
 #    x-axis front edge of scene shown in bottom of screen window
@@ -6,106 +8,162 @@
 #    y-axis points into the scene zero at front edge of scene
 # internal units are meters
 
-m=1
-sw=sceneWidth
-hsw=sceneWidth/2
-sd=sceneDepth
+m = 1
+sw = sceneWidth
+hsw = sceneWidth / 2
+sd = sceneDepth
 
-float toScreenUnit(float sceneDist) {return sceneDist/sceneWidth*width}
 
-class ScreenPoint {int xint yScreenPoint(int xx,int yy){x=xxy=yy}}
+def toScreenUnit(sceneDist):
+    return sceneDist / sceneWidth * width
 
-class ScenePoint {float xfloat yScenePoint(float xx,float yy){x=xxy=yy}
 
-  ScenePoint klone() {return new ScenePoint(x,y)}
-  
-  ScreenPoint toScreenPoint() {
-    int scrX=round(width/2+x/sceneWidth*width)
-    int scrY=round(height-y/sceneDepth*height)
-    return new ScreenPoint(scrX,scrY)}
+class ScreenPoint:
+    x = 0
+    y = 0
 
-  @ Override
-  String toString() {return "<"+x+","+y+">"}
+    def __init__(self, xx, yy):
+        self.x = xx
+        self.y = yy
 
-  boolean runaway(){return x>hsw||x<-hsw||y>sd||y<0}
-  
-  void moveRelXRelY(float deltaX, float deltaY) {x+=deltaXy+=deltaY}
 
-  void moveRelPhiD(float phi, float deltaDist) {
-    float sinNewDir=sin(radians(phi)) float cosNewDir=cos(radians(phi))
-    moveRelXRelY(sinNewDir*deltaDist, cosNewDir*deltaDist)   
-  }
-}
+class ScenePoint:
+    x = 0
+    y = 0
+
+    def __init__(self, xx, yy):
+        self.x = xx
+        self.y = yy
+
+    def klone(self):
+        return self.ScenePoint(self.x, self.y)
+
+    def toScreenPoint(self):
+        scrX = round(width / 2 + self.x / sceneWidth * width)
+        scrY = round(height - self.y / sceneDepth * height)
+        return ScreenPoint(scrX, scrY)
+
+    def toString(self):
+        return "<" + self.x + "," + self.y + ">"
+
+    def runaway(self):
+        return self.x > hsw or self.x < -hsw or self.y > sd or self.y < 0
+
+    def moveRelXRelY(self, deltaX, deltaY):
+        self.x += deltaX
+        self.y += deltaY
+
+    def moveRelPhiD(self, phi, deltaDist):
+        sinNewDir = sin(radians(phi))
+        cosNewDir = cos(radians(phi))
+        self.moveRelXRelY(sinNewDir * deltaDist, cosNewDir * deltaDist)
+
 
 # easy constructor
-ScenePoint p(float x, float y) {return new ScenePoint(x,y)}
+def p(x, y):
+    return ScenePoint(x, y)
 
 
-float dist(ScenePoint p1, ScenePoint p2) {
-  return sqrt( sq(p1.x-p2.x) + sq(p1.y-p2.y))
-}
+def dist(p1, p2):
+    return sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
 
-ScenePoint avg(ScenePoint p1, ScenePoint p2) {return new ScenePoint((p1.x+p2.x)/2,(p1.y+p2.y)/2)}
 
-class Pose {# for a robot
-  ScenePoint position 
-  float direction # 0..360
-  Pose(float xx, float yy, float dd) {position = new ScenePoint(xx,yy) direction=dd}
-  Pose(ScenePoint ss, float dd) {position = ss direction=dd}
-  
-  Pose klone() {return new Pose(position.klone(),direction)} # intuitively same as clone, but returns object of right class
-  @ Override
-  String toString() {return position+"*phi="+direction}
+def avg(p1, p2):
+    return ScenePoint((p1.x + p2.x) / 2, (p1.y + p2.y) / 2)
 
-  void moveRelPhiD(float deltaPhi, float deltaDist) {
-    # phi added to current direction, but scaled by deltaDist AND SOME CONSTANT THAT DEPENDS ON PHYSICAL DETAILS OF THE ROBOT
-    moveAbsPhiD(direction+deltaPhi*abs(deltaDist)*4,deltaDist)
-  }
 
-  void moveAbsPhiD(float phi, float deltaDist) {
-    # set new direction and move
-    direction=normalizeAngle(phi)
-    position.moveRelPhiD(direction,deltaDist)
-  }
-}
+class Pose:  # for a robot
+    position = ScenePoint
+    direction = 0  # 0..360
+
+    def __init__(self, *args, **kwargs):
+        if "xx" and "yy" in kwargs:
+            self.position = ScenePoint(kwargs.get("x"), kwargs.get("y"))
+        elif "ss" in kwargs:
+            self.position = kwargs.get("ss")
+        self.direction = kwargs.get("dd")
+
+    def klone(self):
+        return Pose(self.position.klone(),
+                    self.direction)  # intuitively same as clone, but returns object of right class
+
+    def toString(self):
+        return self.position + "*phi=" + self.direction
+
+    def moveRelPhiD(self, deltaPhi, deltaDist):
+        # phi added to current direction, but scaled by deltaDist AND SOME CONSTANT THAT DEPENDS ON PHYSICAL DETAILS OF THE ROBOT
+        self.moveAbsPhiD(self.direction + deltaPhi * abs(deltaDist) * 4, deltaDist)
+
+    def moveAbsPhiD(self, phi, deltaDist):
+        # set direction and move
+        self.direction = normalizeAngle(phi)
+        self.position.moveRelPhiD(self.direction, deltaDist)
+
 
 # easy constructor:
-Pose pose(float x, float y, float d) {return new Pose(x,y,d)}
+def pose(x, y, d):
+    return Pose(xx=x, yy=y, dd=d)
 
-Pose avg(Pose p1, Pose p2) {
-  return new Pose(avg(p1.position,p2.position),(p1.direction+p2.direction)/2)
-}
+
+def pose(s, d):
+    return Pose(ss=s, dd=d)
+
+
+def avg(p1, p2):
+    return Pose(ss=avg(p1.position, p2.position), dd=(p1.direction + p2.direction) / 2)
+
 
 # directions internally in degrees memotech. as n,e,s,w etc.
 # south means looking out of from scene towards audience
 
-float north=0
-float east=90
-float south=180
-float west=270
-float northEast=north+90/2
-float southEast=south-90/2
-float northWest=west+90/2
-float southWest=west-90/2
-float nne=north+90/4
-float ene=east-90/4
-float ese=east+90/4
-float sse=south-90/4
-float ssw=south+90/4
-float wsw=west-90/4
-float wnw=west+90/4
-float nnw=360-90/4
+north = 0
+east = 90
+south = 180
+west = 270
+northEast = north + 90 / 2
+southEast = south - 90 / 2
+northWest = west + 90 / 2
+southWest = west - 90 / 2
+nne = north + 90 / 4
+ene = east - 90 / 4
+ese = east + 90 / 4
+sse = south - 90 / 4
+ssw = south + 90 / 4
+wsw = west - 90 / 4
+wnw = west + 90 / 4
+nnw = 360 - 90 / 4
 
-float normalizeAngle(float phi) {if(phi<0)return normalizeAngle(phi+360)else if(phi>=360)return normalizeAngle(phi-360) else return phi}
-float normalizeAngleRad(float phi) {if(phi<0)return normalizeAngle(phi+TWO_PI)else if(phi>=TWO_PI)return normalizeAngle(phi-TWO_PI) else return phi}
 
-static final float robotTurningDiameter = 0.7
-  # Currently only used for checking feasibility of generated route
-  # in mkXXXXXRouteXXXX should be correlated with constant epsilon and expected robot diameter
+def normalizeAngle(phi):
+    if phi < 0:
+        return normalizeAngle(phi + 360)
+    elif phi >= 360:
+        return normalizeAngle(phi - 360)
+    else:
+        return phi
 
-float dist(Pose p1, Pose p2) {
-  # plain euclidian, ignoring direction
-  return dist(p1.position, p2.position)
-}
-float dist(Pose p1, ScenePoint p2) {return dist(p1.position, p2)}
-float dist(ScenePoint p1, Pose p2) {return dist(p1, p2.position)}
+
+def normalizeAngleRad(phi):
+    if phi < 0:
+        return normalizeAngle(phi + 2 * pi)
+    elif phi >= 2 * pi:
+        return normalizeAngle(phi - 2 * pi)
+    else:
+        return phi
+
+
+robotTurningDiameter = 0.7
+
+
+# Currently only used for checking feasibility of generated route
+# in mkXXXXXRouteXXXX should be correlated with constant epsilon and expected robot diameter
+
+def dist(p1, p2):
+    # plain euclidian, ignoring direction
+    return dist(p1.position, p2.position)
+
+
+def dist(p1, p2): return dist(p1.position, p2)
+
+
+def dist(p1, p2): return dist(p1, p2.position)
