@@ -176,10 +176,36 @@ def dist(p1, p2): return dist(p1, p2.position)
 if __name__ == '__main__':
     setHeight(2000)
     setWidth(1000)
-    setSceneDepth(5)
-    setSceneWidth(10)
+    setSceneDepth(50)
+    setSceneWidth(100)
     print("testing setHeight(2000): " + height
           + " setWidth(1000): " + width
           + " setSceneDepth(5): " + sd
           + " setSceneWidth(10)" + sw
           + " half SceneWidth: " + hsw)
+
+    print("Testing ScenePoint")
+
+    s = ScenePoint(10, 20)
+    s2 = s.clone()
+    p = p(20, 30)
+    print("ScenePoint(10, 20): " + s.toString()
+          + "s.clone(): " + s2.toString()
+          + "p(20, 30): " + p.toString())
+    
+    print("s.runaway()" + s.runaway())
+
+    s.moveRelPhiD(90, sw)
+    print("s.moveRelPhiD(90, sw)" + s.toString())
+
+    print("s.runaway()" + s.runaway())
+
+    s.moveRelPhiD(-90, -sw)
+    print("s.moveRelPhiD(-90, -sw)" + s.toString())
+
+    s.moveRelXRelY(sw, 0)
+    print("s.moveRelXRelY(sw, 0)" + s.toString())
+
+
+
+
