@@ -36,21 +36,6 @@ def setHeight(h):
     height = h
 
 
-#Not needed in robot control program
-def toScreenUnit(sceneDist):
-    return sceneDist / sw * width
-
-
-#Not needed in robot control program
-class ScreenPoint:
-    x = 0
-    y = 0
-
-    def __init__(self, xx, yy):
-        self.x = xx
-        self.y = yy
-
-
 class ScenePoint:
     x = 0
     y = 0
@@ -61,11 +46,6 @@ class ScenePoint:
 
     def klone(self):
         return self.ScenePoint(self.x, self.y)
-
-    def toScreenPoint(self):
-        scrX = round(width / 2 + self.x / sw * width)
-        scrY = round(height - self.y / sd * height)
-        return ScreenPoint(scrX, scrY)
 
     def toString(self):
         return "<" + self.x + "," + self.y + ">"
