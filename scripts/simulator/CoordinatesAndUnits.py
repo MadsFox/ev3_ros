@@ -206,9 +206,9 @@ if __name__ == '__main__':
     s.moveRelXRelY(-sw, 0)
     print("s.moveRelXRelY(-sw, 0):  {}".format(s.toString()))
 
-    print("dist(s, s3):              {}".format(dist(s, s3)))
+    print("dist(s, s3):             {}".format(dist(s, s3)))
 
-    print("s.avg(s3):                {}".format(s.avg(s3).toString()))
+    print("s.avg(s3):               {}".format(s.avg(s3).toString()))
 
     print("")
     print("Testing ScenePoint")
@@ -235,8 +235,8 @@ if __name__ == '__main__':
     p.moveAbsPhiD(-90, 0)
     print("p.moveRelXRelY(-sw, 0):  {}".format(p.toString()))
 
-    print("dist(p, p3):              {}".format(dist(p, p3)))
+    print("dist(p, p3):             {}".format(dist(p, p3)))
 
-    print("p.avg(p3):                {}".format(p.avg(p3).toString()))
+    print("p.avg(p3):               {}".format(p.avg(p3).toString()))
 
 
