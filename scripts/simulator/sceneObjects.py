@@ -9,11 +9,11 @@ class SceneObject:
     def __init__(self, name):
         self.name = name
 
-    def hasInside(self, sp):
-        return False  # to be overridden (when relevant)
-
-    def hasInside(self, p):
-        return self.hasInside(p.position)
+    def hasInside(self, po):
+        if isinstance(po, ScenePoint):
+            return False
+        elif isinstance(po, Pose):
+            return self.hasInside(po.position)
 
 
 allSceneObjects = []
@@ -34,28 +34,29 @@ maxSpeed = 1  # m/sec self version: the same for all robots
 
 
 class Robot(SceneObject):
-    pose = Pose()
+    pose = None
     diameter = 0.3  # meters
 
-    def __init__(self, *args, **kwargs):
-        SceneObject.__init__(self, kwargs.get("n"))
-        self.name = kwargs.get("n")
-        if "po" in kwargs:
-            self.pose = kwargs.get("po")
-        elif "ps" and "d" in kwargs:
-            self.pose = Pose(pp=kwargs.get("ps"), dd=kwargs.get("d"))
+    def __init__(self, n, po=None, d=None):
+        SceneObject.__init__(self, n)
+        self.name = n
+        if d is None:
+            self.pose = po
+        elif po is None:
+            self.pose = Pose(po, d)
         addSceneObject(self)
 
-    def set(self, p, d):
-        self.pose = Pose(ss=p, dd=d)
-
-    def set(self, p):
-        self.pose = p
+    def set(self, po, d=None):
+        if d is None:
+            self.pose = po
+        else:
+            self.pose = Pose(po, d)
 
     def hasInside(self, sp):
         x = self.pose.position.x
         y = self.pose.position.y
-        return x - self.diameter / 2 <= sp.x <= x + self.diameter / 2 and y - self.diameter / 2 <= sp.y <= y + self.diameter / 2
+        return (x - self.diameter / 2 <= sp.x <= x + self.diameter / 2 and
+                y - self.diameter / 2 <= sp.y <= y + self.diameter / 2)
 
     def overlappingOther(self):
         x = self.pose.position.x
@@ -63,14 +64,15 @@ class Robot(SceneObject):
         r = self.diameter / 2
         result = False
         for i in allSceneObjects:
-            if self not in allSceneObjects:
-                if allSceneObjects.hasInside(p(x + r, y + r)):
+            if self is not i:
+                if allSceneObjects[i].hasInside(p(x + r, y + r)):
                     result = True
                 if allSceneObjects[i].hasInside(p(x - r, y + r)):
                     result = True
                 if allSceneObjects[i].hasInside(p(x + r, y - r)):
                     result = True
-                if allSceneObjects[i].hasInside(p(x - r, y - r)): result = True
+                if allSceneObjects[i].hasInside(p(x - r, y - r)):
+                    result = True
         return result
 
     def runaway(self):
@@ -90,102 +92,94 @@ class Robot(SceneObject):
 
 
 # easy constructors
-def robot(n):
-    return Robot(n)
-
-
-def robot(n, p):
-    Robot(n, po=p)
-
-
-def robot(n, p, d):
-    return Robot(n, ps=p, d=d)
+def robot(n, po=None, d=None):
+    if d is None:
+        return Robot(n, po)
+    elif po and d is None:
+        return Robot(n)
+    else:
+        return Robot(n, po, d)
 
 
 class RestrictedArea(SceneObject):
     lowerLeft = ScenePoint
     upperRight = ScenePoint
 
-    def __init__(self, *args, ** kwargs):
-        SceneObject.__init__(self, kwargs.get("n"))
+    def __init__(self, n, ll, w, d=None):
+        SceneObject.__init__(self, n)
         # adjust so two corner points really becomes lowerLeft,upperRight
-        x0 = min(kwargs.get("ll").x, kwargs.get("ur").x)
-        x1 = max(kwargs.get("ll").x, kwargs.get("ur").x)
-        y0 = min(kwargs.get("ll").y, kwargs.get("ur").y)
-        y1 = max(kwargs.get("ll").y, kwargs.get("ur").y)
-        ll = ScenePoint(x0, y0)
-        ur = ScenePoint(x1, y1)
-        self.name = kwargs.get("n")
-        self.lowerLeft = ll
-        if "ur" in kwargs:
-            self.upperRight = ur
-        elif "width" and "depth" in kwargs:
-            self.upperRight = ScenePoint(ll.x + kwargs.get("width"), ll.y + kwargs.get("depth"))
+        self.name = n
+        if d is None:
+            x0 = min(ll.x, w.x)
+            x1 = max(ll.x, w.x)
+            y0 = min(ll.y, w.y)
+            y1 = max(ll.y, w.y)
+            self.lowerLeft = ScenePoint(x0, y0)
+            self.upperRight = ScenePoint(x1, y1)
+        else:
+            self.lowerLeft = ll
+            self.upperRight = ScenePoint(ll.x+w, ll.y+d)
         addSceneObject(self)
 
-    def hasInside(self, p):
-        return self.lowerLeft.x <= p.x <= self.upperRight.x and self.lowerLeft.y <= p.y <= self.upperRight.y
+    def hasInside(self, po):
+        return self.lowerLeft.x <= po.x <= self.upperRight.x and self.lowerLeft.y <= po.y <= self.upperRight.y
 
 
 # easy constructors
-def restrictedArea(n, corner1, corner2):
-    return RestrictedArea(n, corner1, corner2)
-
-
-def restrictedArea(n, ll, width, depth):
-    return RestrictedArea(n, ll, width, depth)
+def restrictedArea(n, ll, w, d=None):
+    if d is None:
+        return RestrictedArea(n, ll, w)
+    else:
+        return RestrictedArea(n, ll, w, d)
 
 
 class ReferencePoint(SceneObject):
     point = ScenePoint
 
-    def __init__(self, p, *args, **kwargs):
-        if "n" in kwargs:
-            SceneObject.__init__(self, kwargs.get("n"))
-            self.name = kwargs.get("n")
-        else:
+    def __init__(self, n, p=None):
+        if p is None:
             SceneObject.__init__(self, "")
             self.name = ""
-        self.point = p.klone()
+            self.point = p.klone()
+        else:
+            SceneObject.__init__(self, n)
+            self.name = n
+            self.point = p
         addSceneObject(self)
 
+
 # easy constructors
-def referencePoint(p):
-    return ReferencePoint(p)
-
-
-def referencePoint(n, p):
-    return ReferencePoint(p, n=n)
-
-
-def referencePoint(x, y):
-    return ReferencePoint(ScenePoint(x, y))
-
-
-def referencePoint(n, x, y):
-    return ReferencePoint(ScenePoint(x, y), n=n)
+def referencePoint(n, x=None, y=None):
+    if x and y is None:
+        return ReferencePoint(n)
+    elif y is None and isinstance(x, ScenePoint):
+        return ReferencePoint(n, x)
+    elif y is None and isinstance(x, int):
+        return ReferencePoint(ScenePoint(n, x))
+    else:
+        return ReferencePoint(n, ScenePoint(x, y))
 
 
 class Grid(SceneObject):
     resolution = 0
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, r=None):
         SceneObject.__init__(self, "Grid")
         self.name = "Grid"
-        if "r" in kwargs:
-            self.resolution = kwargs.get("r")
-        else:
+        if r is None:
             self.resolution = 1
+        else:
+            self.resolution = r
         addSceneObject(self)
 
 
 # easy constructors
-def grid(r):
-    return Grid(r=r)
+def grid(r=None):
+    if r is None:
+        return Grid()
+    else:
+        return Grid(r)
 
-
-def grid():
-    return Grid()
 
 if __name__ == "__main__":
     print("Testing Robot constructors: ")

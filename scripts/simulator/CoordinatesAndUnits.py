@@ -238,5 +238,3 @@ if __name__ == '__main__':
     print("dist(p, p3):             {}".format(dist(p, p3)))
 
     print("p.avg(p3):               {}".format(p.avg(p3).toString()))
-
-
