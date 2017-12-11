@@ -14,24 +14,25 @@ sd = None
 width = None
 height = None
 
-def setSceneWidth(width):
+
+def set_scene_width(w):
     global sw
-    sw = width
+    sw = w
     global hsw
     hsw = sw/2
 
 
-def setSceneDepth(height):
+def set_scene_depth(h):
     global sd
-    sd = height
+    sd = h
 
 
-def setWidth(w):
+def set_width(w):
     global width
     width = w
 
 
-def setHeight(h):
+def set_height(h):
     global height
     height = h
 
@@ -47,20 +48,20 @@ class ScenePoint:
     def klone(self):
         return ScenePoint(self.x, self.y)
 
-    def toString(self):
+    def to_string(self):
         return "<{},{}>".format(self.x, self.y)
 
     def runaway(self):
         return self.x > hsw or self.x < -hsw or self.y > sd or self.y < 0
 
-    def moveRelXRelY(self, deltaX, deltaY):
-        self.x += deltaX
-        self.y += deltaY
+    def move_rel_x_rel_y(self, delta_x, delta_y):
+        self.x += delta_x
+        self.y += delta_y
 
-    def moveRelPhiD(self, phi, deltaDist):
-        sinNewDir = sin(radians(phi))
-        cosNewDir = cos(radians(phi))
-        self.moveRelXRelY(sinNewDir * deltaDist, cosNewDir * deltaDist)
+    def move_rel_phi_d(self, phi, delta_dist):
+        sin_new_dir = sin(radians(phi))
+        cos_new_dir = cos(radians(phi))
+        self.move_rel_x_rel_y(sin_new_dir * delta_dist, cos_new_dir * delta_dist)
 
     def avg(self, point):
         return ScenePoint((self.x + point.x) / 2, (self.y + point.y) / 2)
@@ -87,23 +88,23 @@ class Pose:  # for a robot
         return Pose(self.position.klone(),
                     self.direction)  # intuitively same as clone, but returns object of right class
 
-    def toString(self):
+    def to_string(self):
         return "<{},{}*phi={}>".format(self.position.x, self.position.y, self.direction)
 
     def runaway(self):
         return self.position.runaway()
 
-    def moveRelPhiD(self, deltaPhi, deltaDist):
+    def move_rel_phi_d(self, delta_phi, delta_dist):
         # phi added to current direction, but scaled by deltaDist AND SOME CONSTANT THAT DEPENDS ON PHYSICAL DETAILS OF THE ROBOT
-        self.moveAbsPhiD(self.direction + deltaPhi * abs(deltaDist) * 4, deltaDist)
+        self.move_abs_phi_d(self.direction + delta_phi * abs(delta_dist) * 4, delta_dist)
 
-    def moveAbsPhiD(self, phi, deltaDist):
+    def move_abs_phi_d(self, phi, delta_dist):
         # set direction and move
-        self.direction = normalizeAngle(phi)
-        self.position.moveRelPhiD(self.direction, deltaDist)
+        self.direction = normalize_angle(phi)
+        self.position.move_rel_phi_d(self.direction, delta_dist)
 
-    def avg(self, pose):
-        return Pose(self.position.avg(pose.position), (self.direction + pose.direction) / 2)
+    def avg(self, po):
+        return Pose(self.position.avg(po.position), (self.direction + po.direction) / 2)
 
 
 # easy constructor:
@@ -135,20 +136,20 @@ wnw = west + 90 / 4
 nnw = 360 - 90 / 4
 
 
-def normalizeAngle(phi):
+def normalize_angle(phi):
     if phi < 0:
-        return normalizeAngle(phi + 360)
+        return normalize_angle(phi + 360)
     elif phi >= 360:
-        return normalizeAngle(phi - 360)
+        return normalize_angle(phi - 360)
     else:
         return phi
 
 
-def normalizeAngleRad(phi):
+def normalize_angle_rad(phi):
     if phi < 0:
-        return normalizeAngle(phi + 2 * pi)
+        return normalize_angle(phi + 2 * pi)
     elif phi >= 2 * pi:
-        return normalizeAngle(phi - 2 * pi)
+        return normalize_angle(phi - 2 * pi)
     else:
         return phi
 
@@ -171,10 +172,10 @@ def dist(p1, p2):
 
 
 if __name__ == '__main__':
-    setHeight(2000)
-    setWidth(1000)
-    setSceneDepth(50)
-    setSceneWidth(100)
+    set_height(2000)
+    set_width(1000)
+    set_scene_depth(50)
+    set_scene_width(100)
     print("testing setHeight(2000): {}".format(height))
     print("setWidth(1000):          {}".format(width))
     print("setSceneDepth(5):        {}".format(sd))
@@ -187,28 +188,28 @@ if __name__ == '__main__':
     s = ScenePoint(10, 20)
     s2 = s.klone()
     s3 = p(10, 30)
-    print("s = ScenePoint(10, 20):  {}".format(s.toString()))
-    print("s2 = s.clone():          {}".format(s2.toString()))
-    print("s3 = p(20, 30):          {}".format(s3.toString()))
+    print("s = ScenePoint(10, 20):  {}".format(s.to_string()))
+    print("s2 = s.clone():          {}".format(s2.to_string()))
+    print("s3 = p(20, 30):          {}".format(s3.to_string()))
 
     print("s.runaway():             {}".format(s.runaway()))
 
-    s.moveRelPhiD(90, sw)
-    print("s.moveRelPhiD(90, sw):   {}".format(s.toString()))
+    s.move_rel_phi_d(90, sw)
+    print("s.moveRelPhiD(90, sw):   {}".format(s.to_string()))
 
     print("s.runaway():             {}".format(s.runaway()))
 
-    s.moveRelPhiD(90, -sw)
-    print("s.moveRelPhiD(90, -sw):  {}".format(s.toString()))
+    s.move_rel_phi_d(90, -sw)
+    print("s.moveRelPhiD(90, -sw):  {}".format(s.to_string()))
 
-    s.moveRelXRelY(sw, 0)
-    print("s.moveRelXRelY(sw, 0):   {}".format(s.toString()))
-    s.moveRelXRelY(-sw, 0)
-    print("s.moveRelXRelY(-sw, 0):  {}".format(s.toString()))
+    s.move_rel_x_rel_y(sw, 0)
+    print("s.moveRelXRelY(sw, 0):   {}".format(s.to_string()))
+    s.move_rel_x_rel_y(-sw, 0)
+    print("s.moveRelXRelY(-sw, 0):  {}".format(s.to_string()))
 
     print("dist(s, s3):             {}".format(dist(s, s3)))
 
-    print("s.avg(s3):               {}".format(s.avg(s3).toString()))
+    print("s.avg(s3):               {}".format(s.avg(s3).to_string()))
 
     print("")
     print("Testing ScenePoint")
@@ -216,25 +217,25 @@ if __name__ == '__main__':
     p = Pose(10, 20, 90)
     pk = s.klone()
     p3 = pose(10, 30, 0)
-    print("p = Pose(10, 20):        {}".format(p.toString()))
-    print("pk = s.clone():          {}".format(pk.toString()))
-    print("p3 = pose(20, 30, 0):    {}".format(p3.toString()))
+    print("p = Pose(10, 20):        {}".format(p.to_string()))
+    print("pk = s.clone():          {}".format(pk.to_string()))
+    print("p3 = pose(20, 30, 0):    {}".format(p3.to_string()))
 
     print("p.runaway():             {}".format(p.runaway()))
 
-    p.moveRelPhiD(0, sw)
-    print("p.moveRelPhiD(90, sw):   {}".format(p.toString()))
+    p.move_rel_phi_d(0, sw)
+    print("p.moveRelPhiD(90, sw):   {}".format(p.to_string()))
 
     print("p.runaway():             {}".format(p.runaway()))
 
-    p.moveRelPhiD(90, -sw)
-    print("p.moveRelPhiD(90, -sw):  {}".format(p.toString()))
+    p.move_rel_phi_d(90, -sw)
+    print("p.moveRelPhiD(90, -sw):  {}".format(p.to_string()))
 
-    p.moveAbsPhiD(90, 0)
-    print("p.moveRelXRelY(sw, 0):   {}".format(p.toString()))
-    p.moveAbsPhiD(-90, 0)
-    print("p.moveRelXRelY(-sw, 0):  {}".format(p.toString()))
+    p.move_abs_phi_d(90, 0)
+    print("p.moveRelXRelY(sw, 0):   {}".format(p.to_string()))
+    p.move_abs_phi_d(-90, 0)
+    print("p.moveRelXRelY(-sw, 0):  {}".format(p.to_string()))
 
     print("dist(p, p3):             {}".format(dist(p, p3)))
 
-    print("p.avg(p3):               {}".format(p.avg(p3).toString()))
+    print("p.avg(p3):               {}".format(p.avg(p3).to_string()))

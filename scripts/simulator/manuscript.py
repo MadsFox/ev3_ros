@@ -6,17 +6,17 @@ from manuscriptHelpers import *
 
 def manuscript():
     grid()
-    referencePoint(hsw / 2, sd / 2)
-    referencePoint(-hsw / 2, sd / 2)
+    reference_point(hsw / 2, sd / 2)
+    reference_point(-hsw / 2, sd / 2)
 
-    restrictedArea("green stuff", p(-hsw + 0.5, sd - 1.75), p(-hsw + 3, sd - 2))
-    restrictedArea("light stuff", p(0.5, 0.5), p(hsw - 2, 1))
+    restricted_area("green stuff", p(-hsw + 0.5, sd - 1.75), p(-hsw + 3, sd - 2))
+    restricted_area("light stuff", p(0.5, 0.5), p(hsw - 2, 1))
 
     nille = robot("Nille")
     frederik = robot("Frederik")
 
-    initialPose(nille, pose(hsw / 2 + 1, sd / 4, west))  # initialPose skal komme før wait, follow..., osv.
-    initialPose(frederik, pose(hsw / 2, sd / 4 + 1, south))
+    initial_pose(nille, pose(hsw / 2 + 1, sd / 4, west))  # initialPose skal komme før wait, follow..., osv.
+    initial_pose(frederik, pose(hsw / 2, sd / 4 + 1, south))
     # meetAndGreat(nille, frederik, -hsw/2, sd/2)
     wait(nille, 2)
 
@@ -58,14 +58,14 @@ def manuscript():
     moveToBacking(frederik, pose(1, sd / 2 + 0.75, ssw))
     moveTo(frederik, pose(1, sd / 2, south))
 
-    circleRight(nille, 0.75, 180)
-    circleRight(frederik, 0.75, 180)
-    circleRight(nille, 0.375, 180)
-    circleRight(frederik, 0.375, 180)
-    circleRightBacking(nille, 0.375, 40)
-    circleRight(frederik, 0.375, 40)
-    circleRight(nille, 0.375, 40)
-    circleRightBacking(frederik, 0.375, 40)
+    circle_right(nille, 0.75, 180)
+    circle_right(frederik, 0.75, 180)
+    circle_right(nille, 0.375, 180)
+    circle_right(frederik, 0.375, 180)
+    circle_right_backing(nille, 0.375, 40)
+    circle_right(frederik, 0.375, 40)
+    circle_right(nille, 0.375, 40)
+    circle_right_backing(frederik, 0.375, 40)
 
     moveToBacking(nille, pose(0, sd / 2 - 0.75, north))
     moveToBacking(frederik, pose(0, sd / 2 + 0.75, south))
@@ -76,7 +76,7 @@ def manuscript():
     moveToBacking(frederik, pose(0.5, sd / 2 + 0.75, ssw))
 
     moveTo(nille, pose(1, sd + 2, north))
-    circleRight(frederik, 0.5, 180)
+    circle_right(frederik, 0.5, 180)
     wait(frederik, 0.5)
     moveTo(frederik, pose(1, sd + 2, north))
 

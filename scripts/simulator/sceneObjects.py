@@ -9,23 +9,23 @@ class SceneObject:
     def __init__(self, name):
         self.name = name
 
-    def hasInside(self, po):
+    def has_inside(self, po):
         if isinstance(po, ScenePoint):
             return False
         elif isinstance(po, Pose):
-            return self.hasInside(po.position)
+            return self.has_inside(po.position)
 
 
 allSceneObjects = []
 
 
-def indexOf(so):
+def index_of(so):
     if so in allSceneObjects:
         return allSceneObjects.index(so)
     return -1
 
 
-def addSceneObject(so):
+def add_scene_object(so):
     allSceneObjects.append(so)
 
 
@@ -42,9 +42,9 @@ class Robot(SceneObject):
         self.name = n
         if d is None:
             self.pose = po
-        elif po is None:
+        elif d and po is not None:
             self.pose = Pose(po, d)
-        addSceneObject(self)
+        add_scene_object(self)
 
     def set(self, po, d=None):
         if d is None:
@@ -52,26 +52,26 @@ class Robot(SceneObject):
         else:
             self.pose = Pose(po, d)
 
-    def hasInside(self, sp):
+    def has_inside(self, sp):
         x = self.pose.position.x
         y = self.pose.position.y
         return (x - self.diameter / 2 <= sp.x <= x + self.diameter / 2 and
                 y - self.diameter / 2 <= sp.y <= y + self.diameter / 2)
 
-    def overlappingOther(self):
+    def overlapping_other(self):
         x = self.pose.position.x
         y = self.pose.position.y
         r = self.diameter / 2
         result = False
         for i in allSceneObjects:
             if self is not i:
-                if allSceneObjects[i].hasInside(p(x + r, y + r)):
+                if allSceneObjects[i].has_inside(p(x + r, y + r)):
                     result = True
-                if allSceneObjects[i].hasInside(p(x - r, y + r)):
+                if allSceneObjects[i].has_inside(p(x - r, y + r)):
                     result = True
-                if allSceneObjects[i].hasInside(p(x + r, y - r)):
+                if allSceneObjects[i].has_inside(p(x + r, y - r)):
                     result = True
-                if allSceneObjects[i].hasInside(p(x - r, y - r)):
+                if allSceneObjects[i].has_inside(p(x - r, y - r)):
                     result = True
         return result
 
@@ -119,14 +119,14 @@ class RestrictedArea(SceneObject):
         else:
             self.lowerLeft = ll
             self.upperRight = ScenePoint(ll.x+w, ll.y+d)
-        addSceneObject(self)
+        add_scene_object(self)
 
-    def hasInside(self, po):
+    def has_inside(self, po):
         return self.lowerLeft.x <= po.x <= self.upperRight.x and self.lowerLeft.y <= po.y <= self.upperRight.y
 
 
 # easy constructors
-def restrictedArea(n, ll, w, d=None):
+def restricted_area(n, ll, w, d=None):
     if d is None:
         return RestrictedArea(n, ll, w)
     else:
@@ -136,20 +136,20 @@ def restrictedArea(n, ll, w, d=None):
 class ReferencePoint(SceneObject):
     point = ScenePoint
 
-    def __init__(self, n, p=None):
+    def __init__(self, n, po=None):
         if p is None:
             SceneObject.__init__(self, "")
             self.name = ""
-            self.point = p.klone()
+            self.point = po.klone()
         else:
             SceneObject.__init__(self, n)
             self.name = n
-            self.point = p
-        addSceneObject(self)
+            self.point = po
+        add_scene_object(self)
 
 
 # easy constructors
-def referencePoint(n, x=None, y=None):
+def reference_point(n, x=None, y=None):
     if x and y is None:
         return ReferencePoint(n)
     elif y is None and isinstance(x, ScenePoint):
@@ -170,7 +170,7 @@ class Grid(SceneObject):
             self.resolution = 1
         else:
             self.resolution = r
-        addSceneObject(self)
+        add_scene_object(self)
 
 
 # easy constructors
@@ -183,6 +183,9 @@ def grid(r=None):
 
 if __name__ == "__main__":
     print("Testing Robot constructors: ")
-    Robot()
-    robot()
-
+    print('Robot("palle"): {}'.format(Robot("palle")))
+    print('Robot("palle", ScenePoint(10, 20), 90): {}'.format(Robot("palle", ScenePoint(10, 20), 90)))
+    print('Robot("palle", Pose(10, 20, 90): {}'.format(Robot("palle", ScenePoint(10, 20), 90)))
+    print('robot("palle"): {}'.format(robot("palle")))
+    print('robot("palle", ScenePoint(10, 20), 90): {}'.format(robot("palle", ScenePoint(10, 20), 90)))
+    print('robot("palle", Pose(10, 20, 90): {}'.format(robot("palle", ScenePoint(10, 20), 90)))

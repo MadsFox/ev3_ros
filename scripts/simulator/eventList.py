@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from time import *
-from CoordinatesAndUnits import *
 from sceneObjects import *
 
 
@@ -13,52 +12,49 @@ class Event:
     rob = Robot
     nextPose = Pose  # in nextPose=null, self means a no-event used for implementing waiting
 
-    def __init__(self, tt, rr, *args, **kwargs):
+    def __init__(self, tt, rr, pp):
         self.time = tt
         self.rob = rr
-        if "pp" in kwargs:
-            self.nextPose = kwargs.get("pp").klone()
-        elif "waitingTime" in kwargs:
-            self.time = tt + kwargs.get("waitingTime")
+        if isinstance(pp, Pose):
+            self.nextPose = pp.klone()
+        else:
+            self.time = tt + pp
             self.nextPose = None
-        eventList.add(self)
+        eventList.append(self)
 
-    def compareTo(self, e):
-        d = self.time - e.time
+    def compare_to(self, event):
+        d = self.time - event.time
         if d < 0:
             return -1
         elif d > 0:
             return 1
         return 0
 
-    def toString(self):
+    def to_string(self):
         return self.time + ": " + self.rob.name + self.nextPose
 
 
 eventList = []
 
 
-def timeOfLastGeneratedEvent():
+def time_of_last_generated_event(r=None):
     t = -1
-    for i in eventList:
-        if (i.time in eventList) < t:
-            t = eventList[i].time
+    if r is not None:
+        for i in eventList:
+            if eventList[i].rob == r and eventList[i].time > t:
+                t = eventList[i].time
+    else:
+        for i in eventList:
+            if (i.time in eventList) < t:
+                t = eventList[i].time
     return t
 
 
-def timeOfLastGeneratedEvent(r):
-    t = -1
-    for i in eventList:
-        if eventList[i].rob == r and eventList[i].time > t:
-            t = eventList[i].time
-    return t
-
-
-def sortEventList():
+def sort_event_list():
     eventList.sort()
 
 
-def printEventList():
+def print_event_list():
     for i in eventList:
         print(eventList[i] + "")
 
@@ -68,16 +64,17 @@ initialMachineTime = 0
 simulationTime = 0
 
 
-def initTime():
-    initialMachineTime = time.clock()
+def init_time():
+    global initialMachineTime
+    initialMachineTime = clock()
 
 
-def currentSimulationTime():
-    return (time.clock() - initialMachineTime) / 1000
+def current_simulation_time():
+    return (clock() - initialMachineTime) / 1000
 
 
-def executeCurrentEvents():
-    t = currentSimulationTime()
+def execute_current_events():
+    t = current_simulation_time()
     # println("executeCurrentEvents() at sim. time "+t+", remaining events: " +eventList.size())
     while len(eventList) > 0 and eventList[0].time < t:
         if eventList[0].nextPose is not None:
@@ -85,6 +82,5 @@ def executeCurrentEvents():
         del eventList[0]
 
 
-def noMoreEvents():
-    return eventList.isEmpty()
-
+def no_more_events():
+    return len(eventList) <= 0
