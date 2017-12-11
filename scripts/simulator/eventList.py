@@ -87,3 +87,4 @@ def executeCurrentEvents():
 
 def noMoreEvents():
     return eventList.isEmpty()
+

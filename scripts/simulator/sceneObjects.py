@@ -186,3 +186,9 @@ def grid(r):
 
 def grid():
     return Grid()
+
+if __name__ == "__main__":
+    print("Testing Robot constructors: ")
+    Robot()
+    robot()
+

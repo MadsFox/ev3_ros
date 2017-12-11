@@ -10,6 +10,10 @@ height = 1000
 scriptFileName = "hubahop"
 
 if __name__ == "__main__":
+    setSceneWidth(sceneWidth)
+    setSceneDepth(sceneDepth)
+    setWidth(width)
+    setHeight(height)
     # the following should preserve the proportions of (sceneWidth,sceneDepth)
     manuscript()
     sortEventList()  # IMPORTANT!!!!

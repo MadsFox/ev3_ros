@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from simulator import *
 from math import *
 
 # scene coordinate system
@@ -9,15 +8,40 @@ from math import *
 # internal units are meters
 
 m = 1
-sw = sceneWidth
-hsw = sceneWidth / 2
-sd = sceneDepth
+sw = None
+hsw = None
+sd = None
+width = None
+height = None
+
+def setSceneWidth(width):
+    global sw
+    sw = width
+    global hsw
+    hsw = sw/2
 
 
+def setSceneDepth(height):
+    global sd
+    sd = height
+
+
+def setWidth(w):
+    global width
+    width = w
+
+
+def setHeight(h):
+    global height
+    height = h
+
+
+#Not needed in robot control program
 def toScreenUnit(sceneDist):
-    return sceneDist / sceneWidth * width
+    return sceneDist / sw * width
 
 
+#Not needed in robot control program
 class ScreenPoint:
     x = 0
     y = 0
@@ -39,8 +63,8 @@ class ScenePoint:
         return self.ScenePoint(self.x, self.y)
 
     def toScreenPoint(self):
-        scrX = round(width / 2 + self.x / sceneWidth * width)
-        scrY = round(height - self.y / sceneDepth * height)
+        scrX = round(width / 2 + self.x / sw * width)
+        scrY = round(height - self.y / sd * height)
         return ScreenPoint(scrX, scrY)
 
     def toString(self):
@@ -167,3 +191,15 @@ def dist(p1, p2): return dist(p1.position, p2)
 
 
 def dist(p1, p2): return dist(p1, p2.position)
+
+
+if __name__ == '__main__':
+    setHeight(2000)
+    setWidth(1000)
+    setSceneDepth(5)
+    setSceneWidth(10)
+    print("testing setHeight(2000): " + height
+          + " setWidth(1000): " + width
+          + " setSceneDepth(5): " + sd
+          + " setSceneWidth(10)" + sw
+          + " half SceneWidth: " + hsw)
