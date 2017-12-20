@@ -15,7 +15,7 @@ def manuscript():
     nille = robot("Nille")
     frederik = robot("Frederik")
 
-    initial_pose(nille, pose(hsw / 2 + 1, sd / 4, west))  # initialPose skal komme før wait, follow..., osv.
+    initial_pose(nille, pose(hsw / 2 + 1, sd / 4, west))  # initialPose has to be called before wait, follow..., osv.
     initial_pose(frederik, pose(hsw / 2, sd / 4 + 1, south))
     # meetAndGreat(nille, frederik, -hsw/2, sd/2)
     wait(nille, 2)
@@ -32,7 +32,7 @@ def manuscript():
 
     wait(nille, 3)
 
-    synchronize()  # denne her er fiks: alle venter til sidste mand følger trop
+    synchronize()  # This is a fix: all have to wait for the last man
 
     moveToBacking(nille, pose(-hsw / 8 + 1, sd / 4 + 1, south))
     moveToBacking(frederik, pose(+hsw / 8 + 1, sd / 4 + 1, south))
@@ -84,7 +84,7 @@ def manuscript():
 def meetAndGreat(r1, r2, x, y):
     moveTo(r1, x - 1, y, east)
     moveTo(r2, x + 1, y, west)
-    synchronize(r1, r2)
+    synchronize()
     moveTo(r1, x - 0.25, y, east)
     moveTo(r2, x + 0.25, y, west)
     wait(r1, 1)

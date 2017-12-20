@@ -8,14 +8,24 @@ from eventList import *
 mostRecentRecordedPose = []  # enough
 
 
-def initial_pose(r, p):
+def initial_pose(r, po):
     # maintain manuscript writing time information
     mostRecentRecordedPose[index_of(r)] = p  # crashes if robot not present
     # maintain internal reresentation of script
-    Event(0, r, p)
+    Event(0, r, po)
 
 
-def move_to(r, start_time, to):
+def moveTo(r, *args):
+    start_time = time_of_last_generated_event(r)
+    to = args[0]
+    if len(args) is 2 and not isinstance(Pose, args[0]):
+        start_time = args[0]
+        to = args[1]
+    elif len(args) > 2 and not isinstance(Pose, args[0]):
+        moveTo(r, Pose(args[0], args[1], args[2]), args[3:])
+    elif len(args) > 2:
+        to = args[0]
+        moveTo(r, args[1:])
     route = forward_route(mostRecentRecordedPose[index_of(r)], to)
     mostRecentRecordedPose[index_of(r)] = to
     # arbitrary speed in this version
@@ -23,88 +33,22 @@ def move_to(r, start_time, to):
         Event(start_time + float(i) / 50, r, route.poses[i])
 
 
-def moveTo(r, to):
-    move_to(r, time_of_last_generated_event(r), to)
-
-
-def moveTo(r, x, y, phi):
-    move_to(r, Pose(x, y, phi))
-
-
-def moveTo(r, via, to):
-    move_to(r, via)
-    move_to(r, to)
-
-
-def moveTo(r, via1, via2, to):
-    move_to(r, via1)
-    move_to(r, via2)
-    move_to(r, to)
-
-
-def moveTo(r, via1, via2, via3, to):
-    move_to(r, via1)
-    move_to(r, via2)
-    move_to(r, via3)
-    move_to(r, to)
-
-
-def moveTo(r, x1, y1, phi1, x2, y2, phi2, x, y, phi):
-    move_to(r, Pose(x1, y1, phi1))
-    move_to(r, Pose(x2, y2, phi2))
-    move_to(r, Pose(x, y, phi))
-
-
-def moveTo(r, x1, y1, phi1, x, y, phi):
-    move_to(r, Pose(x1, y1, phi1))
-    move_to(r, Pose(x, y, phi))
-
-
-def moveToBacking(r, startTime, to):
-    # returns arrival time
+def moveToBacking(r, *args):
+    start_time = time_of_last_generated_event(r)
+    to = args[0]
+    if len(args) is 2 and not isinstance(Pose, args[0]):
+        start_time = args[0]
+        to = args[1]
+    elif len(args) > 2 and not isinstance(Pose, args[0]):
+        moveToBacking(r, Pose(args[0], args[1], args[2]), args[3:])
+    elif len(args) > 2:
+        to = args[0]
+        moveToBacking(r, args[1:])
     route = backward_route(mostRecentRecordedPose[index_of(r)], to)
     mostRecentRecordedPose[index_of(r)] = to
     # arbitrary speed in this version
     for i in route.noOfSteps:
-        Event(startTime + float(i) / 50, r, route.poses[i])
-
-
-def moveToBacking(r, to):
-    moveToBacking(r, time_of_last_generated_event(r), to)
-
-
-def moveToBacking(r, x, y, phi):
-    moveToBacking(r, Pose(xx=x, yy=y, dd=phi))
-
-
-def moveToBacking(r, via, to):
-    moveToBacking(r, via)
-    move_to(r, to)
-
-
-def moveToBacking(r, via1, via2, to):
-    moveToBacking(r, via1)
-    moveToBacking(r, via2)
-    moveToBacking(r, to)
-
-
-def moveToBacking(r, via1, via2, via3, to):
-    moveToBacking(r, via1)
-    moveToBacking(r, via2)
-    moveToBacking(r, via3)
-    moveToBacking(r, to)
-
-
-def moveToBacking(r, x1, y1, phi1, x2, y2, phi2, x, y, phi):
-    moveToBacking(r, Pose(xx=x1, yy=y1, dd=phi1))
-    moveToBacking(r, Pose(xx=x2, yy=y2, dd=phi2))
-    moveToBacking(r, Pose(xx=x, yy=y, dd=phi))
-
-
-def moveToBacking(r, x1, y1, phi1,
-                  x, y, phi):
-    moveToBacking(r, Pose(xx=x1, yy=y1, dd=phi1))
-    moveToBacking(r, Pose(xx=x, yy=y, dd=phi))
+        Event(start_time + float(i) / 50, r, route.poses[i])
 
 
 def wait(r, waiting_time):

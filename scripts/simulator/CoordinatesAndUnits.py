@@ -72,39 +72,38 @@ def p(x, y):
     return ScenePoint(x, y)
 
 
-class Pose:  # for a robot
-    position = ScenePoint
+class Pose(ScenePoint):  # for a robot
     direction = 0  # 0..360
 
-    def __init__(self, xx, yy, dd=None):
-        if dd is None:
-            self.position = xx
+    def __init__(self, xx, yy, *args):
+        if len(args) < 1:
+            ScenePoint.__init__(self, xx.x, xx.y)
             self.direction = yy
         else:
-            self.position = ScenePoint(xx, yy)
-            self.direction = dd
+            ScenePoint.__init__(self, xx, yy)
+            self.direction = args[0]
 
     def klone(self):
-        return Pose(self.position.klone(),
-                    self.direction)  # intuitively same as clone, but returns object of right class
+        return Pose(self.x, self.y, self.direction)  # intuitively same as clone, but returns object of right class
 
     def to_string(self):
-        return "<{},{}*phi={}>".format(self.position.x, self.position.y, self.direction)
+        return "<{},{}*phi={}>".format(self.x, self.y, self.direction)
 
     def runaway(self):
-        return self.position.runaway()
+        return self.runaway()
 
     def move_rel_phi_d(self, delta_phi, delta_dist):
-        # phi added to current direction, but scaled by deltaDist AND SOME CONSTANT THAT DEPENDS ON PHYSICAL DETAILS OF THE ROBOT
+        # phi added to current direction, but scaled by deltaDist
+        # AND SOME CONSTANT THAT DEPENDS ON PHYSICAL DETAILS OF THE ROBOT
         self.move_abs_phi_d(self.direction + delta_phi * abs(delta_dist) * 4, delta_dist)
 
     def move_abs_phi_d(self, phi, delta_dist):
         # set direction and move
         self.direction = normalize_angle(phi)
-        self.position.move_rel_phi_d(self.direction, delta_dist)
+        self.move_rel_phi_d(self.direction, delta_dist)
 
     def avg(self, po):
-        return Pose(self.position.avg(po.position), (self.direction + po.direction) / 2)
+        return Pose((self.x + po.x) / 2, (self.y + po.y) / 2, (self.direction + po.direction) / 2)
 
 
 # easy constructor:
@@ -161,13 +160,6 @@ robotTurningDiameter = 0.7
 # in mkXXXXXRouteXXXX should be correlated with constant epsilon and expected robot diameter
 
 def dist(p1, p2):
-    if isinstance(p1, Pose) and isinstance(p2, Pose):
-        p1 = p1.position
-        p2 = p2.position
-    elif isinstance(p1, ScenePoint) and isinstance(p2, Pose):
-        p2 = p2.position
-    elif isinstance(p1, Pose) and isinstance(p2, ScenePoint):
-        p1 = p1.position
     return sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
 
 
