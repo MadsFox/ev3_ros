@@ -12,8 +12,8 @@ def manuscript():
     restricted_area("green stuff", p(-hsw + 0.5, sd - 1.75), p(-hsw + 3, sd - 2))
     restricted_area("light stuff", p(0.5, 0.5), p(hsw - 2, 1))
 
-    nille = robot("Nille")
-    frederik = robot("Frederik")
+    nille = robot("Nille", 0.3, 0.2)
+    frederik = robot("Frederik", 0.3, 0.2)
 
     initial_pose(nille, pose(hsw / 2 + 1, sd / 4, west))  # initialPose has to be called before wait, follow..., osv.
     initial_pose(frederik, pose(hsw / 2, sd / 4 + 1, south))

@@ -13,7 +13,7 @@ class SceneObject:
         if isinstance(po, ScenePoint):
             return False
         elif isinstance(po, Pose):
-            return self.has_inside(po.position)
+            return self.has_inside(po)
 
 
 allSceneObjects = []
@@ -29,20 +29,23 @@ def add_scene_object(so):
     allSceneObjects.append(so)
 
 
-maxTurn = 35  # degrees self version: the same for all robots
-maxSpeed = 1  # m/sec self version: the same for all robots
-
-
 class Robot(SceneObject):
+    max_turn = 35  # degrees self version: the same for all robots
+    max_speed = 1  # m/sec self version: the same for all robots
     pose = None
     diameter = 0.3  # meters
+    wheel_distance = 0
+    wheel_diameter = 0
 
-    def __init__(self, n, po=None, d=None):
+    def __init__(self, n, po=None, d=None, wdist=None, wdia=None, mt=None, ms=None):
         SceneObject.__init__(self, n)
-        self.name = n
-        if d is None:
+        self.wheel_diameter = wdia
+        self.wheel_distance = wdist
+        self.max_speed = ms
+        self.max_turn = mt
+        if isinstance(po, Pose):
             self.pose = po
-        elif d and po is not None:
+        elif d and isinstance(po, ScenePoint):
             self.pose = Pose(po, d)
         add_scene_object(self)
 
@@ -52,15 +55,15 @@ class Robot(SceneObject):
         else:
             self.pose = Pose(po, d)
 
-    def has_inside(self, sp):
-        x = self.pose.position.x
-        y = self.pose.position.y
-        return (x - self.diameter / 2 <= sp.x <= x + self.diameter / 2 and
-                y - self.diameter / 2 <= sp.y <= y + self.diameter / 2)
+    def has_inside(self, scp):
+        x = self.pose.x
+        y = self.pose.y
+        return (x - self.diameter / 2 <= scp.x <= x + self.diameter / 2 and
+                y - self.diameter / 2 <= scp.y <= y + self.diameter / 2)
 
     def overlapping_other(self):
-        x = self.pose.position.x
-        y = self.pose.position.y
+        x = self.pose.x
+        y = self.pose.y
         r = self.diameter / 2
         result = False
         for i in allSceneObjects:
@@ -76,8 +79,8 @@ class Robot(SceneObject):
         return result
 
     def runaway(self):
-        x = self.pose.position.x
-        y = self.pose.position.y
+        x = self.pose.x
+        y = self.pose.y
         r = self.diameter / 2
         result = False
         if p(x + r, y + r).runaway():
@@ -92,13 +95,8 @@ class Robot(SceneObject):
 
 
 # easy constructors
-def robot(n, po=None, d=None):
-    if d is None:
-        return Robot(n, po)
-    elif po and d is None:
-        return Robot(n)
-    else:
-        return Robot(n, po, d)
+def robot(*args):
+    return Robot(args)
 
 
 class RestrictedArea(SceneObject):
@@ -183,9 +181,9 @@ def grid(r=None):
 
 if __name__ == "__main__":
     print("Testing Robot constructors: ")
-    print('Robot("palle"): {}'.format(Robot("palle")))
+    print('Robot("palle"): {}'.format(Robot("palle", 0.2, 0.1)))
     print('Robot("palle", ScenePoint(10, 20), 90): {}'.format(Robot("palle", ScenePoint(10, 20), 90)))
     print('Robot("palle", Pose(10, 20, 90): {}'.format(Robot("palle", ScenePoint(10, 20), 90)))
-    print('robot("palle"): {}'.format(robot("palle")))
+    print('robot("palle"): {}'.format(robot("palle", 0.2, 0.1)))
     print('robot("palle", ScenePoint(10, 20), 90): {}'.format(robot("palle", ScenePoint(10, 20), 90)))
     print('robot("palle", Pose(10, 20, 90): {}'.format(robot("palle", ScenePoint(10, 20), 90)))

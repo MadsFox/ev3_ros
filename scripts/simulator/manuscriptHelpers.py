@@ -17,6 +17,8 @@ def initial_pose(r, po):
 
 def moveTo(r, *args):
     start_time = time_of_last_generated_event(r)
+    r_index = allSceneObjects.index(r)
+    rob = allSceneObjects[r_index]
     to = args[0]
     if len(args) is 2 and not isinstance(Pose, args[0]):
         start_time = args[0]
@@ -26,7 +28,7 @@ def moveTo(r, *args):
     elif len(args) > 2:
         to = args[0]
         moveTo(r, args[1:])
-    route = forward_route(mostRecentRecordedPose[index_of(r)], to)
+    route = forward_route(mostRecentRecordedPose[index_of(r)], to, rob.max_turn)
     mostRecentRecordedPose[index_of(r)] = to
     # arbitrary speed in this version
     for i in route.noOfSteps:
@@ -35,6 +37,8 @@ def moveTo(r, *args):
 
 def moveToBacking(r, *args):
     start_time = time_of_last_generated_event(r)
+    r_index = allSceneObjects.index(r)
+    rob = allSceneObjects[r_index]
     to = args[0]
     if len(args) is 2 and not isinstance(Pose, args[0]):
         start_time = args[0]
@@ -44,7 +48,7 @@ def moveToBacking(r, *args):
     elif len(args) > 2:
         to = args[0]
         moveToBacking(r, args[1:])
-    route = backward_route(mostRecentRecordedPose[index_of(r)], to)
+    route = backward_route(mostRecentRecordedPose[index_of(r)], to, rob.max_turn)
     mostRecentRecordedPose[index_of(r)] = to
     # arbitrary speed in this version
     for i in route.noOfSteps:

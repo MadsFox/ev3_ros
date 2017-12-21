@@ -26,7 +26,7 @@ class Route:  # find bedre navn
     # }
 
 
-def forward_route(from_pose, to):
+def forward_route(from_pose, to, max_turn):
     travel_dist = 0
     first_half = []
     last_half = []
@@ -42,7 +42,7 @@ def forward_route(from_pose, to):
         best_dist = 10000000
         for k in range(0, 101):  # use odd number (100+1) so "straight ahead" is also an option
             suggest = current_from.klone()
-            suggest.move_rel_phi_d(-maxTurn + float(k) / 101 * 2 * maxTurn, epsilon)
+            suggest.move_rel_phi_d(-max_turn + float(k) / 101 * 2 * max_turn, epsilon)
             suggest_dist = dist(suggest, current_to)
             if suggest_dist < best_dist:
                 best_dist = suggest_dist
@@ -57,7 +57,7 @@ def forward_route(from_pose, to):
         best_dist = 10000000
         for k in range(0, 101):  # use odd number (100+1) so "straight ahead" is also an option
             suggest = current_to.klone()
-            suggest.move_rel_phi_d(-maxTurn + float(k) / 101 * 2 * maxTurn,
+            suggest.move_rel_phi_d(-max_turn + float(k) / 101 * 2 * max_turn,
                                    -epsilon)  # break symmetry by change of direction
             suggest_dist = dist(suggest, current_from)
             if suggest_dist < best_dist:
@@ -86,16 +86,16 @@ def forward_route(from_pose, to):
 # #############################
 
 
-def backward_route(from_pose, to):
-    r = mk_backward_route_from_both_ends_internal(from_pose, to)
+def backward_route(from_pose, to, max_turn):
+    r = mk_backward_route_from_both_ends_internal(from_pose, to, max_turn)
     if r is None:
         print("Route(" + from_pose + ", " + to + ") too complicated try something else")
         sys.exit(1)
     return r
 
 
-def mk_backward_route_from_both_ends_internal(from_pose, to):
-    r = forward_route(to, from_pose)
+def mk_backward_route_from_both_ends_internal(from_pose, to, max_turn):
+    r = forward_route(to, from_pose, max_turn)
     if r is None:
         return None
     # reverse

@@ -68,7 +68,7 @@ class ScenePoint:
 
 
 # easy constructor
-def p(x, y):
+def sp(x, y):
     return ScenePoint(x, y)
 
 
@@ -179,7 +179,7 @@ if __name__ == '__main__':
 
     s = ScenePoint(10, 20)
     s2 = s.klone()
-    s3 = p(10, 30)
+    s3 = sp(10, 30)
     print("s = ScenePoint(10, 20):  {}".format(s.to_string()))
     print("s2 = s.clone():          {}".format(s2.to_string()))
     print("s3 = p(20, 30):          {}".format(s3.to_string()))
